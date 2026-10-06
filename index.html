@@ -1,0 +1,4191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#fafafa">
+<meta name="description" content="Aznur Restaurant Business Studio — local-first restaurant analytics.">
+<title>Aznur Restaurant Business Studio</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<script async src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script async src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root {
+  --bg:#fafafa;
+  --panel:#fff;
+  --panel2:#fafaf9;
+  --border:#e7e5e4;
+  --border2:#d6d3d1;
+  --text:#1c1917;
+  --dim:#57534e;
+  --dimmer:#78716c;
+  --accent:#f59e0b;
+  --accent2:#d97706;
+  --green:#10b981;
+  --yellow:#f59e0b;
+  --red:#ef4444;
+  --green-soft:#ecfdf5;
+  --warn-soft:#fffbeb;
+  --red-soft:#fef2f2;
+  --shadow:0 1px 2px rgba(0,0,0,.05);
+  --radius:6px;
+  --sidebar:246px;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+
+}
+
+* {
+  box-sizing:border-box;
+
+}
+
+html,body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:13px;
+
+}
+
+body {
+  overflow-x:hidden;
+
+}
+
+button,input,select,textarea {
+  font:inherit;
+
+}
+
+button {
+  cursor:pointer;
+
+}
+
+::-webkit-scrollbar {
+  width:8px;
+  height:8px;
+
+}
+
+::-webkit-scrollbar-track {
+  background:transparent;
+
+}
+
+::-webkit-scrollbar-thumb {
+  background:#d6d3d1;
+  border-radius:4px;
+
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background:#a8a29e;
+
+}
+
+.app {
+  display:grid;
+  grid-template-columns:var(--sidebar) minmax(0,1fr);
+  min-height:100vh;
+
+}
+
+.sidebar {
+  position:sticky;
+  top:0;
+  height:100vh;
+  overflow:auto;
+  padding:14px 12px;
+  background:#fafafa;
+  border-right:1px solid var(--border);
+
+}
+
+.brand {
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:4px 6px 12px;
+  margin-bottom:8px;
+  border-bottom:1px solid var(--border);
+
+}
+
+.logo {
+  width:36px;
+  height:36px;
+  display:grid;
+  place-items:center;
+  border:1px solid #fde68a;
+  border-radius:6px;
+  background:#fffbeb;
+  color:var(--accent2);
+  font-weight:800;
+
+}
+
+.brand h1 {
+  margin:0;
+  font-size:13px;
+
+}
+
+.brand small {
+  display:block;
+  margin-top:3px;
+  color:var(--dimmer);
+  font-size:10px;
+
+}
+
+.section-label {
+  margin:16px 6px 7px;
+  color:var(--dimmer);
+  font:9px var(--mono);
+  letter-spacing:1.4px;
+  text-transform:uppercase;
+
+}
+
+.nav {
+  display:grid;
+  gap:2px;
+
+}
+
+.nav button {
+  width:100%;
+  padding:8px 9px;
+  border:1px solid transparent;
+  border-radius:4px;
+  background:transparent;
+  color:var(--dim);
+  text-align:left;
+  font-size:11.5px;
+
+}
+
+.nav button:hover {
+  border-color:var(--border);
+  background:#fffbeb;
+  color:var(--text);
+
+}
+
+.nav button.active {
+  border-color:#fde68a;
+  background:#fffbeb;
+  color:var(--accent2);
+  font-weight:650;
+
+}
+
+.sidefoot {
+  margin:16px 5px 0;
+  padding-top:12px;
+  border-top:1px solid var(--border);
+  color:var(--dimmer);
+  font-size:9.5px;
+  line-height:1.5;
+
+}
+
+.content {
+  min-width:0;
+
+}
+
+.topbar {
+  position:sticky;
+  top:0;
+  z-index:10;
+  min-height:58px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:8px 18px;
+  background:linear-gradient(180deg,#fff,#fafafa);
+  border-bottom:1px solid var(--border);
+
+}
+
+.topbar h2 {
+  margin:0;
+  font-size:14px;
+  font-weight:650;
+
+}
+
+.top-actions,.toolbar {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex-wrap:wrap;
+
+}
+
+.container {
+  width:min(1680px,100%);
+  margin:auto;
+  padding:20px;
+
+}
+
+.view {
+  display:none;
+
+}
+
+.view.active {
+  display:block;
+  animation:fade .18s ease;
+
+}
+
+@keyframes fade {
+  from {
+    opacity:.1;
+    transform:translateY(3px);
+  }
+  to {
+    opacity:1;
+    transform:none;
+  }
+
+}
+
+.pagehead {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:18px;
+  margin-bottom:14px;
+
+}
+
+.pagehead h3 {
+  margin:0;
+  font:14px var(--mono);
+  letter-spacing:1.4px;
+  text-transform:uppercase;
+
+}
+
+.pagehead p {
+  margin:5px 0 0;
+  color:var(--dimmer);
+  font-size:11px;
+
+}
+
+.grid {
+  display:grid;
+  gap:12px;
+
+}
+
+.kpis {
+  grid-template-columns:repeat(6,minmax(0,1fr));
+
+}
+
+.two {
+  grid-template-columns:1.45fr .95fr;
+
+}
+
+.three {
+  grid-template-columns:repeat(3,minmax(0,1fr));
+
+}
+
+.four {
+  grid-template-columns:repeat(4,minmax(0,1fr));
+
+}
+
+.card,.stat {
+  min-width:0;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--panel);
+  box-shadow:var(--shadow);
+
+}
+
+.card {
+  padding:14px 15px;
+
+}
+
+.stat {
+  position:relative;
+  overflow:hidden;
+  padding:12px 13px;
+  background:var(--panel2);
+
+}
+
+.stat:before {
+  position:absolute;
+  inset:0 auto 0 0;
+  width:2px;
+  content:"";
+  background:var(--accent);
+  opacity:.75;
+
+}
+
+.card h4 {
+  margin:0 0 11px;
+  color:var(--accent2);
+  font:10.5px var(--mono);
+  letter-spacing:1.2px;
+  text-transform:uppercase;
+
+}
+
+.stat .k {
+  color:var(--dimmer);
+  font:9px var(--mono);
+  letter-spacing:1px;
+  text-transform:uppercase;
+
+}
+
+.stat .v {
+  margin:5px 0 2px;
+  font:700 18px var(--mono);
+  font-variant-numeric:tabular-nums;
+
+}
+
+.stat .d {
+  color:var(--dimmer);
+  font:9px var(--mono);
+
+}
+
+.field label {
+  display:block;
+  margin-bottom:4px;
+  color:var(--dimmer);
+  font:9px var(--mono);
+
+}
+
+.field input,.field select,.field textarea,.topbar select {
+  width:100%;
+  padding:7px 8px;
+  border:1px solid var(--border);
+  border-radius:4px;
+  background:#fff;
+  color:var(--text);
+  font-size:11px;
+
+}
+
+.field textarea {
+  min-height:78px;
+  resize:vertical;
+
+}
+
+.field input:focus,.field select:focus,.field textarea:focus,.topbar select:focus {
+  outline:none;
+  border-color:var(--accent);
+  box-shadow:0 0 0 2px rgba(245,158,11,.08);
+
+}
+
+.formgrid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:9px;
+
+}
+
+.span2 {
+  grid-column:span 2;
+
+}
+
+.btn {
+  min-height:30px;
+  padding:6px 10px;
+  border:1px solid var(--border);
+  border-radius:4px;
+  background:#fff;
+  color:var(--accent2);
+  font-size:11px;
+
+}
+
+.btn:hover {
+  border-color:var(--accent);
+  background:#fffbeb;
+  box-shadow:0 0 0 2px rgba(245,158,11,.08);
+
+}
+
+.btn.primary {
+  border-color:var(--accent);
+  background:var(--accent);
+  color:#fff;
+
+}
+
+.btn.primary:hover {
+  border-color:var(--accent2);
+  background:var(--accent2);
+
+}
+
+.btn.danger {
+  border-color:#fecaca;
+  background:var(--red-soft);
+  color:#b91c1c;
+
+}
+
+.btn.small {
+  min-height:28px;
+  padding:5px 8px;
+  font-size:10px;
+
+}
+
+.pill {
+  display:inline-flex;
+  align-items:center;
+  min-height:25px;
+  padding:4px 8px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:#fff;
+  color:var(--dimmer);
+  font:9px var(--mono);
+
+}
+
+.tablewrap {
+  overflow:auto;
+  border:1px solid var(--border);
+  border-radius:4px;
+
+}
+
+.table {
+  width:100%;
+  border-collapse:collapse;
+  font:9.5px var(--mono);
+  font-variant-numeric:tabular-nums;
+
+}
+
+.table th,.table td {
+  padding:7px;
+  border-bottom:1px solid var(--border);
+  text-align:left;
+  white-space:nowrap;
+
+}
+
+.table th {
+  position:sticky;
+  top:0;
+  background:#fafaf9;
+  color:var(--dim);
+  font-size:8.5px;
+  letter-spacing:.7px;
+  text-transform:uppercase;
+
+}
+
+.table tbody tr:hover td {
+  background:#fffbeb;
+
+}
+
+.table tbody tr:last-child td {
+  border-bottom:0;
+
+}
+
+.badge {
+  display:inline-flex;
+  align-items:center;
+  padding:3px 6px;
+  border-radius:999px;
+  font:700 8.5px var(--mono);
+  letter-spacing:.2px;
+
+}
+
+.badge.good {
+  background:var(--green-soft);
+  color:#047857;
+
+}
+
+.badge.warn {
+  background:var(--warn-soft);
+  color:#b45309;
+
+}
+
+.badge.bad {
+  background:var(--red-soft);
+  color:#b91c1c;
+
+}
+
+.badge.info {
+  background:#f1f5f9;
+  color:#475569;
+
+}
+
+.metric-list,.list-clean {
+  display:grid;
+  gap:6px;
+  padding:0;
+  margin:0;
+  list-style:none;
+
+}
+
+.metric-row {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  padding:7px 0;
+  border-bottom:1px solid var(--border);
+  font-size:10px;
+
+}
+
+.metric-row:last-child {
+  border-bottom:0;
+
+}
+
+.metric-row strong {
+  font:10px var(--mono);
+  text-align:right;
+
+}
+
+.list-clean li {
+  padding:8px 9px;
+  border:1px solid var(--border);
+  border-radius:4px;
+  background:var(--panel2);
+  font-size:10px;
+  line-height:1.45;
+
+}
+
+.notice,.warning,.dangerbox,.successbox {
+  padding:9px 10px;
+  border:1px solid var(--border);
+  border-left-width:2px;
+  border-radius:4px;
+  font-size:9.5px;
+  line-height:1.5;
+
+}
+
+.notice {
+  border-left-color:var(--accent);
+  background:#fffbeb;
+  color:#78350f;
+
+}
+
+.warning {
+  border-left-color:var(--yellow);
+  background:#fffbeb;
+  color:#92400e;
+
+}
+
+.dangerbox {
+  border-left-color:var(--red);
+  background:#fef2f2;
+  color:#991b1b;
+
+}
+
+.successbox {
+  border-left-color:var(--green);
+  background:#ecfdf5;
+  color:#065f46;
+
+}
+
+.progress {
+  height:5px;
+  overflow:hidden;
+  border-radius:999px;
+  background:#e7e5e4;
+
+}
+
+.progress i {
+  display:block;
+  height:100%;
+  background:var(--accent);
+  border-radius:inherit;
+
+}
+
+.chartbox {
+  height:285px;
+  position:relative;
+
+}
+
+.chartbox.sm {
+  height:210px;
+
+}
+
+.chartbox.tall {
+  height:345px;
+
+}
+
+.drop {
+  padding:22px 18px;
+  border:1px dashed #fbbf24;
+  border-radius:5px;
+  background:#fffbeb;
+  text-align:center;
+
+}
+
+.drop.drag {
+  background:#fef3c7;
+
+}
+
+.drop input {
+  display:none;
+
+}
+
+.drop strong {
+  display:block;
+  font:10px var(--mono);
+  letter-spacing:.6px;
+  text-transform:uppercase;
+
+}
+
+.drop span {
+  display:block;
+  margin:5px 0 10px;
+  color:var(--dimmer);
+  font-size:9px;
+
+}
+
+.taggrid {
+  display:flex;
+  gap:5px;
+  flex-wrap:wrap;
+
+}
+
+.tag {
+  padding:5px 7px;
+  border:1px solid var(--border);
+  border-radius:4px;
+  background:var(--panel2);
+  color:var(--dim);
+  font:8.5px var(--mono);
+  cursor:pointer;
+
+}
+
+.tag:hover {
+  border-color:#fde68a;
+  background:#fffbeb;
+  color:var(--accent2);
+
+}
+
+.empty {
+  padding:22px 10px;
+  color:var(--dimmer);
+  text-align:center;
+  font-size:10px;
+
+}
+
+.hr {
+  height:1px;
+  margin:12px 0;
+  background:var(--border);
+
+}
+
+.muted {
+  color:var(--dimmer);
+
+}
+
+.smalltext {
+  font-size:10px;
+
+}
+
+.modal {
+  position:fixed;
+  inset:0;
+  z-index:50;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(28,25,23,.22);
+
+}
+
+.modal.show {
+  display:flex;
+
+}
+
+.modalbox {
+  width:min(1000px,100%);
+  max-height:88vh;
+  overflow:auto;
+  padding:16px;
+  border:1px solid var(--border);
+  border-radius:6px;
+  background:#fff;
+  box-shadow:0 18px 50px rgba(0,0,0,.15);
+
+}
+
+.modalhead {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:12px;
+
+}
+
+.modalhead h3 {
+  margin:0;
+  color:var(--accent2);
+  font:11px var(--mono);
+  letter-spacing:1px;
+  text-transform:uppercase;
+
+}
+
+.close {
+  width:28px;
+  height:28px;
+  border:1px solid var(--border);
+  border-radius:4px;
+  background:#fff;
+  color:var(--dim);
+
+}
+
+.close:hover {
+  border-color:var(--accent);
+
+}
+
+.toast {
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  z-index:100;
+  padding:9px 12px;
+  border:1px solid var(--green);
+  border-radius:4px;
+  background:var(--green-soft);
+  color:#047857;
+  font:9.5px var(--mono);
+  box-shadow:0 5px 14px rgba(0,0,0,.08);
+  opacity:0;
+  transform:translateY(5px);
+  pointer-events:none;
+  transition:.18s;
+
+}
+
+.toast.show {
+  opacity:1;
+  transform:none;
+
+}
+
+.statusbar {
+  display:flex;
+  align-items:center;
+  gap:18px;
+  min-height:24px;
+  padding:0 18px;
+  border-top:1px solid var(--border);
+  background:#fff;
+  color:var(--dimmer);
+  font:8.5px var(--mono);
+
+}
+
+.statusbar b {
+  color:var(--accent2);
+  font-weight:600;
+
+}
+
+
+.import-summary {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin-bottom:10px;
+}
+.import-stat {
+  padding:9px;
+  border:1px solid var(--border);
+  border-radius:4px;
+  background:var(--panel2);
+}
+.import-stat span {
+  display:block;
+  color:var(--dimmer);
+  font:9px var(--mono);
+  text-transform:uppercase;
+  letter-spacing:.8px;
+}
+.import-stat strong {
+  display:block;
+  margin-top:4px;
+  font:700 13px var(--mono);
+}
+.import-map-table select {
+  min-width:210px;
+}
+.check-row {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-size:10px;
+  color:var(--dim);
+}
+.check-row input {
+  accent-color:var(--accent);
+}
+@media(max-width:820px){
+  .import-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .import-map-table select{min-width:140px}
+}
+
+@media(max-width:1180px) {
+  .kpis {
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  .two,.three,.four {
+    grid-template-columns:1fr 1fr;
+  }
+  .formgrid {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+}
+
+@media(max-width:860px) {
+  .app {
+    grid-template-columns:1fr;
+  }
+  .sidebar {
+    position:fixed;
+    left:-256px;
+    z-index:40;
+    width:246px;
+    transition:left .18s;
+  }
+  .sidebar.open {
+    left:0;
+  }
+  .container {
+    padding:14px;
+  }
+  .kpis,.two,.three,.four {
+    grid-template-columns:1fr;
+  }
+  .formgrid {
+    grid-template-columns:1fr;
+  }
+  .span2 {
+    grid-column:auto;
+  }
+  .pagehead {
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .top-actions .btn:not(.primary),.top-actions .pill {
+    display:none;
+  }
+
+}
+
+@media print {
+  .sidebar,.topbar,.statusbar,.btn,.toolbar {
+    display:none!important;
+  }
+  .app {
+    display:block;
+  }
+  .container {
+    padding:0;
+  }
+  .view {
+    display:none!important;
+  }
+  .view.active {
+    display:block!important;
+  }
+  .card,.stat {
+    box-shadow:none;
+    break-inside:avoid;
+  }
+
+}
+
+.trend-good {
+  color:#047857!important;
+
+}
+
+.trend-warn {
+  color:#b45309!important;
+
+}
+
+.trend-bad {
+  color:#b91c1c!important;
+
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+<div class="logo">A</div>
+<div>
+<h1>Aznur Restaurant</h1>
+<small>Business Studio</small>
+</div>
+</div>
+    <div class="section-label">Overview</div>
+    <nav class="nav" id="mainNav">
+</nav>
+    <div class="section-label">Planning</div>
+    <nav class="nav" id="planNav">
+</nav>
+    <div class="sidefoot">
+      Local-first • No account required • Your data stays in this browser
+      unless you add a backend later.
+    </div>
+  </aside>
+  <main class="content">
+    <header class="topbar">
+      <div class="toolbar">
+<button class="btn small" id="menuBtn" aria-label="Toggle navigation">☰</button>
+<h2 id="topTitle">Dashboard</h2>
+<span class="pill" id="dataBadge">Demo data</span>
+</div>
+      <div class="top-actions">
+<select id="locationFilter" class="btn small" aria-label="Location filter">
+<option value="ALL">All locations</option>
+</select>
+<button class="btn small" id="demoBtn">Load Demo</button>
+<button class="btn primary small" id="importBtn">Import Data</button>
+</div>
+    </header>
+    <div class="container" id="viewHost">
+</div>
+    <div class="statusbar">
+<span>LOCAL <b id="statusData">DEMO</b>
+</span>
+<span>ROWS <b id="statusRows">0</b>
+</span>
+<span>LOCATIONS <b id="statusLocations">0</b>
+</span>
+<span>ANALYTICS <b id="statusEngine">READY</b>
+</span>
+</div>
+  </main>
+</div>
+<div class="modal" id="modal" aria-hidden="true">
+<div class="modalbox">
+<div class="modalhead">
+<h3 id="modalTitle">Aznur</h3>
+<button class="close" id="closeModal" aria-label="Close">×</button>
+</div>
+<div id="modalBody">
+</div>
+</div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite">
+</div>
+<script>
+
+"use strict";
+/* ============================================================
+   DATA + APP STATE
+   ============================================================ */
+const KEYS = [
+    "sales", "sales_orders", "purchases", "inventory", "inventory_moves", "labor",
+    "expenses", "guests", "reservations", "waste", "recipes", "menu", "locations",
+    "ingredients", "suppliers", "recipe_headers", "payments", "assets", "loans",
+    "marketing", "promotions", "customers", "budget", "events_weather", "tables",
+    "daily_operations", "id_map"
+];
+const CORE = {
+    sales: ["date", "time", "order_id", "item_id", "item_name", "category", "quantity", "unit_price",
+       "gross_sales", "discount", "refund", "void", "net_sales", "tax", "service_charge", "tip",
+          "payment_method", "order_type", "channel", "table", "guest_count", "employee", "location"],
+    purchases: ["date", "vendor", "invoice_id", "ingredient", "ingredient_id", "category", "quantity", "unit",
+       "unit_price", "discount", "tax", "total", "delivery_date", "location"],
+    inventory: ["date", "location", "ingredient", "ingredient_id", "storage_area", "opening_quantity",
+       "closing_quantity", "quantity", "unit", "unit_cost", "inventory_value", "expiry_date"],
+    labor: ["date", "employee", "role", "department", "clock_in", "clock_out", "hours", "regular_hours",
+       "overtime_hours", "hourly_wage", "labor_cost", "tips", "location"],
+    expenses: ["date", "category", "subcategory", "vendor", "description", "amount", "tax", "payment_method",
+       "fixed_or_variable", "location"],
+    guests: ["date", "time", "walk_ins", "reservations", "reservation_covers", "served_covers", "turned_away",
+       "no_shows", "tables_used", "seats_used", "location"],
+    reservations: ["reservation_date", "reservation_time", "booking_id", "customer_id", "party_size", "source",
+       "status", "arrival", "no_show", "cancellation", "table", "location"],
+    waste: ["date", "ingredient", "quantity", "unit", "reason", "cost", "department", "location"],
+    recipes: ["menu_item", "ingredient", "quantity", "unit", "unit_cost", "yield_pct", "prep_minutes"],
+    menu: ["item_id", "item_name", "category", "price", "ingredient_cost", "prep_minutes", "active"]
+};
+
+/* Canonical schemas for the complete Aznur dataset. The original UI
+   already understands these datasets; the universal importer now does too. */
+Object.assign(CORE, {
+    sales_orders: ["order_id","date","time","location","order_type","channel","table_id","guest_count","gross_sales","discount","refund","void","net_sales","tax","service_charge","tip","employee_id","customer_id"],
+    payments: ["date","time","order_id","payment_method","amount","tip","location","reference"],
+    locations: ["location_id","location_name","address","city","country","timezone","active"],
+    ingredients: ["ingredient_id","ingredient_name","category","unit","supplier_id","par_level","reorder_level","active"],
+    suppliers: ["supplier_id","supplier_name","contact","phone","email","lead_days","active"],
+    recipe_headers: ["recipe_id","item_id","recipe_name","prep_minutes","yield_pct","active"],
+    inventory_moves: ["date","location","ingredient","ingredient_id","move_type","quantity","unit","unit_cost","reference"],
+    assets: ["date","asset_id","description","category","cost","useful_life_years","salvage_value","location"],
+    loans: ["date","loan_id","principal","interest_rate","payment","balance","maturity_date"],
+    marketing: ["date","channel","campaign","spend","impressions","clicks","orders","revenue","location"],
+    promotions: ["date","promotion_id","name","start_date","end_date","discount_type","discount_value","redemptions","sales_lift","location"],
+    customers: ["customer_id","name","email","phone","first_visit","last_visit","visit_count","lifetime_value","location"],
+    budget: ["month","category","budget","actual","variance","location"],
+    events_weather: ["date","location","event","event_type","attendance","weather","temperature","rain","holiday"],
+    tables: ["table_id","location","section","capacity","status"],
+    daily_operations: ["date","location","opening_cash","closing_cash","opening_manager","closing_manager","sales_checked","inventory_checked","waste_checked","labor_checked","notes"],
+    id_map: ["source_system","source_id","canonical_type","canonical_id"]
+});
+const MAP = {
+    "01_LOCATION": "locations", "02_MENU_ITEMS": "menu", "03_INGREDIENTS": "ingredients",
+       "04_SUPPLIERS": "suppliers",
+    "05_RECIPES": "recipe_headers", "06_RECIPE_LINES": "recipes", "07_SALES_ORDERS": "sales_orders",
+       "08_SALES_LINES": "sales",
+    "09_PAYMENTS": "payments", "10_GUEST_TRAFFIC": "guests", "11_RESERVATIONS": "reservations",
+       "12_PURCHASES": "purchases",
+    "13_INVENTORY_COUNTS": "inventory", "14_INVENTORY_MOVES": "inventory_moves", "15_WASTE": "waste",
+       "16_LABOR": "labor",
+    "17_EXPENSES": "expenses", "18_ASSETS_CAPEX": "assets", "19_LOANS": "loans", "20_MARKETING": "marketing",
+    "21_PROMOTIONS": "promotions", "22_CUSTOMERS": "customers", "23_BUDGET": "budget",
+       "24_EVENTS_WEATHER": "events_weather",
+    "25_TABLES": "tables", "26_DAILY_OPERATIONS": "daily_operations", "27_ID_MAP": "id_map"
+};
+const IGNORE = new Set(["00_README", "28_EXAMPLE_DATA", "29_LISTS", "30_DATA_DICTIONARY"]);
+const ALIAS = {
+    date: ["day", "business_date", "order_date", "transaction_date", "sale_date"], time: ["order_time",
+       "transaction_time"],
+    order_id: ["order", "check_no", "ticket", "ticket_no", "receipt", "receipt_id"], item_id: ["sku",
+       "product_id"],
+    item_name: ["item", "product", "menu_item", "dish", "description", "name"], category: ["item_category",
+       "department"],
+    quantity: ["qty", "units", "count"], unit_price: ["price", "selling_price", "menu_price"],
+       gross_sales: ["gross", "sales", "revenue", "total_sales"],
+    discount: ["discounts"], refund: ["refunds"], void: ["voids"], net_sales: ["net", "net_revenue", "total"],
+       tax: ["vat"], service_charge: ["service"],
+    tip: ["tips", "gratuity"], payment_method: ["payment", "tender"], order_type: ["service_type"],
+       channel: ["sales_channel", "source"],
+    table: ["table_no"], guest_count: ["guests", "covers", "customer_count", "people"], employee: ["server",
+       "cashier", "staff"],
+    location: ["location_id", "branch", "outlet", "store"], vendor: ["supplier"], ingredient: ["raw_material",
+       "material"], unit: ["uom", "measure"],
+    unit_cost: ["cost_per_unit"], total: ["amount", "purchase_total", "line_total"], labor_cost: ["payroll",
+       "wage_cost"], hours: ["worked_hours", "labor_hours"],
+    role: ["job", "position"], served_covers: ["covers", "guests", "customers"], walk_ins: ["walkins",
+       "walk_ins_count"], reservation_covers: ["reserved_covers"],
+    turned_away: ["turnedaway"], no_shows: ["noshow", "no_show"], tables_used: ["tables"],
+       seats_used: ["occupied_seats"], price: ["selling_price", "menu_price"],
+    ingredient_cost: ["food_cost", "recipe_cost"], prep_minutes: ["prep_time"], reason: ["waste_reason"],
+       cost: ["waste_cost"], fixed_or_variable: ["cost_type"],
+    reservation_date: ["booking_date"], reservation_time: ["booking_time"], party_size: ["pax", "guests"],
+       customer_id: ["guest_id"], booking_id: ["reservation_id"],
+    opening_quantity: ["opening_stock"], closing_quantity: ["closing_stock"], inventory_value: ["stock_value"],
+       expiry_date: ["expiry"], storage_area: ["storage"], yield_pct: ["yield"], active: ["enabled"]
+};
+const DEFAULTS = { name: "Aznur Restaurant", currency: "BDT", seats: 80, hours: 12, fixedMonthly: 0,
+   foodTarget: 30, laborTarget: 20, openingCash: 0, notes: "", demo: false };
+const app = { db: Object.fromEntries(KEYS.map(k => [k, []])), settings: { ...DEFAULTS }, view: "dashboard",
+   rev: 0, cache: new Map(), charts: new Map() };
+const $ = id => document.getElementById(id);
+const MAIN = [
+    "dashboard",
+    "operations",
+    "forecast",
+    "finance",
+    "menu",
+    "inventory",
+    "purchasing",
+    "labor",
+    "customers",
+    "waste"
+];
+
+const PLAN = [
+    "control",
+    "scenarios",
+    "reports",
+    "copilot",
+    "data",
+    "settings"
+];
+
+const TITLES = {
+    dashboard: "Dashboard",
+    operations: "Daily Operations",
+    forecast: "Forecasting",
+    finance: "P&L & Cash",
+    menu: "Menu Engineering",
+    inventory: "Inventory",
+    purchasing: "Purchasing",
+    labor: "Labor",
+    customers: "Customers & Traffic",
+    waste: "Waste & Variance",
+    control: "Margin Control",
+    scenarios: "Scenarios",
+    reports: "Reports",
+    copilot: "Ask the Restaurant",
+    data: "Data Hub",
+    settings: "Settings"
+};
+/* ============================================================
+   SMALL UTILITIES
+   ============================================================ */
+function emptyDb() { return Object.fromEntries(KEYS.map(k => [k, []])); }
+function esc(v) {
+  return String(v ?? "").replace(/[&<>"']/g, (m) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;",
+    "'": "&#39;"
+  }[m]));
+}
+function num(v) { if (v == null || v === "")
+    return 0; if (typeof v === "number")
+    return Number.isFinite(v) ? v : 0; const s = String(v).replace(/[^0-9.\-]/g, "");
+       return s ? Number(s) || 0 : 0; }
+function norm(v) { return String(v || "").toLowerCase().trim().replace(/[\s\-\/().]+/g,
+   "_").replace(/[^a-z0-9_]/g, ""); }
+function parseDate(v) { if (v instanceof Date && !Number.isNaN(v.getTime()))
+    return new Date(v); const s = String(v || "").trim(); if (!s)
+    return null; let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if (m)
+    return new Date(+m[1], +m[2] - 1, +m[3]); m = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})$/); if (m) {
+    let y = +m[3];
+    if (y < 100)
+        y += 2000;
+    return new Date(y, +m[2] - 1, +m[1]);
+} const d = new Date(s); return Number.isNaN(d.getTime()) ? null : d; }
+function dateKey(v) { const d = parseDate(v); if (!d || Number.isNaN(d.getTime()))
+    return ""; return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,
+       "0")}-${String(d.getDate()).padStart(2, "0")}`; }
+function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function currency() { return { BDT: "৳", USD: "$", EUR: "€", INR: "₹", JPY: "¥", GBP: "£" }[app.settings.currency] || app.settings.currency; }
+function money(v) { const n = num(v), a = Math.abs(n); const s = a >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : a >= 1e3 ? `${(n / 1e3).toFixed(1)}K` : Math.round(n).toLocaleString(); return currency() + s; }
+function percent(v) { return `${num(v).toFixed(1)}%`; }
+function cache(key, fn) { const loc = $("locationFilter")?.value || "ALL", k = `${app.rev}|${loc}|${key}`; if (app.cache.has(k))
+    return app.cache.get(k); const v = fn(); app.cache.set(k, v); return v; }
+function invalidate() { app.rev++; app.cache.clear(); }
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(window.__toast); window.__toast = setTimeout(() => t.classList.remove("show"), 2300); }
+function saveState() { try {
+    localStorage.setItem("aznurRestaurantDB", JSON.stringify(app.db));
+    localStorage.setItem("aznurRestaurantSettings", JSON.stringify(app.settings));
+}
+catch (e) {
+    console.warn(e);
+    toast("Local storage is full.");
+} }
+function loadState() { try {
+    const db = JSON.parse(localStorage.getItem("aznurRestaurantDB") || "null");
+    if (db)
+        KEYS.forEach(k => app.db[k] = Array.isArray(db[k]) ? db[k] : []);
+    const s = JSON.parse(localStorage.getItem("aznurRestaurantSettings") || "null");
+    if (s) {
+        app.settings = {
+            ...DEFAULTS,
+            ...s,
+            staffing: { ...DEFAULTS.staffing, ...(s.staffing || {}) },
+            importProfiles: Array.isArray(s.importProfiles)
+                ? s.importProfiles
+                : [],
+            dailyCloses: s.dailyCloses || {}
+        };
+    }
+}
+catch (e) {
+    console.warn(e);
+} }
+function loc(row) { return String(row.location || row.location_id || "").trim(); }
+function filtered(type) { return cache(`f:${type}`, () => { const l = $("locationFilter")?.value || "ALL"; return l === "ALL" ? app.db[type] : (app.db[type] || []).filter(r => loc(r) === l); }); }
+function metric(label, value, foot = "", cls = "") { return `<div class="stat">
+<div class="k">${esc(label)}</div>
+<div class="v ${cls}">${value}</div>
+<div class="d">${esc(foot)}</div>
+</div>`; }
+/* ============================================================
+   UNIVERSAL IMPORT ENGINE
+   ============================================================ */
+const IMPORT_STATE = {
+    queue: [],
+    current: null
+};
+
+const IMPORT_SIGNAL = {
+    sales: {
+        strong: ['date','order_id','item_id','item_name','quantity','unit_price','gross_sales','net_sales','guest_count','employee','channel'],
+        required: ['date','quantity','net_sales']
+    },
+    sales_orders: {
+        strong: ['date','order_id','guest_count','gross_sales','net_sales','discount','tax','payment_method'],
+        required: ['date','order_id','net_sales']
+    },
+    payments: {
+        strong: ['order_id','payment_method','amount','tip'],
+        required: ['order_id','amount']
+    },
+    purchases: {
+        strong: ['date','vendor','invoice_id','ingredient','quantity','unit_cost','total'],
+        required: ['date','ingredient','total']
+    },
+    inventory: {
+        strong: ['date','ingredient','opening_quantity','closing_quantity','quantity','unit_cost','inventory_value'],
+        required: ['date','ingredient','quantity']
+    },
+    labor: {
+        strong: ['date','employee','role','hours','hourly_wage','labor_cost'],
+        required: ['date','hours','labor_cost']
+    },
+    expenses: {
+        strong: ['date','category','vendor','description','amount','fixed_or_variable'],
+        required: ['date','amount']
+    },
+    guests: {
+        strong: ['date','walk_ins','reservation_covers','served_covers','turned_away','no_shows','tables_used','seats_used'],
+        required: ['date','served_covers']
+    },
+    reservations: {
+        strong: ['reservation_date','reservation_time','booking_id','customer_id','party_size','source','status','no_show'],
+        required: ['reservation_date','party_size','status']
+    },
+    waste: {
+        strong: ['date','ingredient','quantity','reason','cost','department'],
+        required: ['date','ingredient','cost']
+    },
+    recipes: {
+        strong: ['menu_item','ingredient','quantity','unit','unit_cost','yield_pct','prep_minutes'],
+        required: ['menu_item','ingredient','quantity','unit_cost']
+    },
+    menu: {
+        strong: ['item_id','item_name','category','price','ingredient_cost','prep_minutes','active'],
+        required: ['item_name','price']
+    }
+};
+
+const COLUMN_HINTS = {
+    date: [/date/, /day/, /businessdate/, /orderdate/, /transactiondate/, /saledate/],
+    time: [/time/, /timestamp/],
+    order_id: [/orderid/, /orderno/, /ordernumber/, /check/, /ticket/, /receipt/, /transactionid/, /billno/],
+    item_id: [/itemid/, /productid/, /itemcode/, /productcode/, /skucode/, /pluid/],
+    item_name: [/item/, /product/, /menuitem/, /dish/, /description/, /pludesc/, /itemdesc/, /menu/],
+    category: [/category/, /department/, /group/, /section/],
+    quantity: [/qty/, /quantity/, /unitsold/, /unitssold/, /soldqty/, /count/],
+    unit_price: [/unitprice/, /price/, /sellingprice/, /menuprice/, /each/],
+    gross_sales: [/gross/, /subtotal/, /sales/, /revenue/, /extendedprice/, /extprice/],
+    discount: [/discount/, /promo/, /markdown/],
+    refund: [/refund/, /return/, /returned/],
+    void: [/void/, /voided/],
+    net_sales: [/netsales/, /netrevenue/, /netamount/, /total/, /grandtotal/, /finalamount/, /amountdue/],
+    tax: [/tax/, /vat/, /gst/, /sales tax/],
+    service_charge: [/servicecharge/, /servicefee/, /gratuity/, /svccharge/],
+    tip: [/tip/, /gratuitytip/],
+    payment_method: [/payment/, /tender/, /paytype/, /method/],
+    order_type: [/ordertype/, /servicetype/, /servemode/, /svcmode/, /dinetake/, /fulfillment/],
+    channel: [/channel/, /source/, /saleschannel/, /platform/, /marketplace/],
+    table: [/table/, /tabl eno/, /table_number/],
+    guest_count: [/guest/, /covers/, /pax/, /customer/, /people/, /party size/],
+    employee: [/server/, /cashier/, /employee/, /staff/, /associate/, /waiter/],
+    location: [/location/, /branch/, /outlet/, /store/, /site/],
+    vendor: [/vendor/, /supplier/, /suppliername/, /vendorname/],
+    invoice_id: [/invoice/, /billno/, /invoiceid/],
+    ingredient: [/ingredient/, /rawmaterial/, /material/, /stockitem/, /inventoryitem/],
+    unit: [/unit/, /uom/, /measure/],
+    unit_cost: [/unitcost/, /costperunit/, /buyprice/, /purchaseprice/, /cost/],
+    total: [/total/, /amount/, /linetotal/, /purchasetotal/, /extendedcost/],
+    labor_cost: [/laborcost/, /payroll/, /wagecost/, /laboramount/],
+    hours: [/hours/, /workedhours/, /laborhours/, /duration/],
+    hourly_wage: [/hourly/, /hourlywage/, /rate/, /payrate/],
+    role: [/role/, /job/, /position/],
+    department: [/department/, /dept/],
+    served_covers: [/servedcovers/, /covers/, /guests/, /customers/, /served/],
+    walk_ins: [/walkin/, /walkins/],
+    reservation_covers: [/reservationcovers/, /reservedcovers/, /bookedcovers/],
+    turned_away: [/turnedaway/, /refused/, /lostguest/],
+    no_shows: [/noshow/, /noshowcount/],
+    tables_used: [/tablesused/, /tables/],
+    seats_used: [/seatsused/, /occupiedseats/],
+    reservation_date: [/reservationdate/, /bookingdate/, /bookdate/],
+    reservation_time: [/reservationtime/, /bookingtime/, /booktime/],
+    booking_id: [/bookingid/, /reservationid/],
+    customer_id: [/customerid/, /guestid/, /memberid/],
+    party_size: [/partysize/, /pax/, /guestcount/, /guests/],
+    status: [/status/, /state/],
+    reason: [/reason/, /wastereason/, /disposalreason/],
+    cost: [/wastecost/, /lossvalue/, /cost/, /amount/],
+    fixed_or_variable: [/fixedvariable/, /costtype/, /variable/],
+    category: [/category/, /department/, /dept/],
+    price: [/price/, /sellingprice/, /menuprice/, /retailprice/],
+    ingredient_cost: [/ingredientcost/, /foodcost/, /recipecost/, /costprice/],
+    prep_minutes: [/prepminutes/, /preptime/, /prep/],
+    yield_pct: [/yield/, /yieldpct/, /recovery/],
+    active: [/active/, /enabled/, /status/]
+};
+
+function sampleValues(rows, key, limit = 20) {
+    return rows.slice(0, limit).map(row => String(row[key] ?? '').trim()).filter(Boolean);
+}
+
+function numberRatio(values) {
+    if (!values.length) return 0;
+    return values.filter(v => {
+        const n = Number(String(v).replace(/[^0-9.\-]/g, ''));
+        return v !== '' && Number.isFinite(n);
+    }).length / values.length;
+}
+
+function dateRatio(values) {
+    if (!values.length) return 0;
+    return values.filter(v => !!parseDate(v)).length / values.length;
+}
+
+function textRatio(values) {
+    if (!values.length) return 0;
+    return values.filter(v => /[A-Za-z]/.test(v)).length / values.length;
+}
+
+function likelyNumericMoney(values) {
+    if (!values.length) return 0;
+    const numeric = numberRatio(values);
+    const moneyLike = values.filter(v => /[$€£¥৳₹]|\d+[,.]\d{2}$/.test(v)).length / values.length;
+    return numeric * .55 + moneyLike * .45;
+}
+
+function semanticScore(source, target, rows) {
+    const n = norm(source).replace(/_/g, '');
+    let score = 0;
+    if (n === norm(target)) score = 100;
+    if ((ALIAS[target] || []).some(a => n === norm(a))) score = Math.max(score, 94);
+    const hints = COLUMN_HINTS[target] || [];
+    if (hints.some(re => re.test(n))) score = Math.max(score, 78);
+
+    const values = sampleValues(rows, source);
+    const nr = numberRatio(values);
+    const dr = dateRatio(values);
+    const tr = textRatio(values);
+    if (target === 'date' || target === 'reservation_date') score += dr * 18;
+    if (['quantity','guest_count','served_covers','walk_ins','party_size','hours','prep_minutes','yield_pct'].includes(target)) score += nr * 13;
+    if (['gross_sales','net_sales','unit_price','total','unit_cost','ingredient_cost','amount','cost','labor_cost','hourly_wage','tip','tax','discount','refund','void'].includes(target)) score += likelyNumericMoney(values) * 13;
+    if (['item_name','ingredient','vendor','employee','role','category','payment_method','channel','order_type','status','reason'].includes(target)) score += tr * 9;
+    return Math.min(100, score);
+}
+
+function schemaScores(rows, type) {
+    const keys = Object.keys(rows[0] || {});
+    const signal = IMPORT_SIGNAL[type] || { strong: [], required: [] };
+    const total = signal.strong.reduce((sum, target) => {
+        const best = Math.max(0, ...keys.map(source => semanticScore(source, target, rows)));
+        return sum + best;
+    }, 0);
+    const requiredHits = signal.required.filter(target =>
+        keys.some(source => semanticScore(source, target, rows) >= 65)
+    ).length;
+    return total + requiredHits * 55;
+}
+
+function inferTypeSmart(name, rows) {
+    const n = norm(name);
+    const candidates = KEYS.filter(k => IMPORT_SIGNAL[k]);
+    const scored = candidates.map(type => ({
+        type,
+        score: schemaScores(rows, type) + (/pos|toast|square|clover|lightspeed|restaurant|sale|order/.test(n) && type.startsWith('sales') ? 35 : 0)
+    })).sort((a, b) => b.score - a.score);
+
+    const best = scored[0] || { type: 'sales', score: 0 };
+    const second = scored[1]?.score || 0;
+    let confidence = Math.round(Math.max(40, Math.min(99, 55 + (best.score - second) * 0.3)));
+
+    const keys = Object.keys(rows[0] || {}).map(norm);
+    const hasItem = keys.some(k => /item|product|plu|dish|menu/.test(k));
+    const hasQty = keys.some(k => /qty|quantity|unitsold|soldqty/.test(k));
+    const hasOrder = keys.some(k => /order|check|ticket|receipt/.test(k));
+    const hasMoney = keys.some(k => /total|amount|revenue|sales|gross|net|price/.test(k));
+    if (hasItem && hasQty && hasMoney) best.type = 'sales';
+    else if (hasOrder && hasMoney && !hasItem && !hasQty) best.type = 'sales_orders';
+
+    return { type: best.type, confidence, ranked: scored.slice(0, 5) };
+}
+
+function bestMapping(rows, type) {
+    const targets = CORE[type] || [];
+    const keys = Object.keys(rows[0] || {});
+    const saved = (app.settings.importProfiles || [])
+        .filter(p => p.type === type)
+        .map(p => p.mapping || {});
+    const mapping = {};
+    const used = new Set();
+
+    for (const target of targets) {
+        let best = null;
+        for (const source of keys) {
+            if (used.has(source)) continue;
+            const direct = semanticScore(source, target, rows);
+            let score = direct;
+            for (const savedMap of saved) {
+                if (savedMap[source] === target) score = Math.max(score, 110);
+            }
+            if (!best || score > best.score) best = { source, score };
+        }
+        if (best && best.score >= 60) {
+            mapping[target] = best.source;
+            used.add(best.source);
+        }
+    }
+    return mapping;
+}
+
+function deriveImportRows(rows, type, mapping) {
+    const get = (row, field) => mapping[field] == null ? '' : row[mapping[field]];
+    return rows.map(row => {
+        const out = {};
+        Object.keys(mapping).forEach(target => {
+            if (mapping[target] != null && row[mapping[target]] !== undefined) {
+                out[target] = row[mapping[target]];
+            }
+        });
+
+        if (type === 'sales') {
+            if (!out.net_sales && out.gross_sales !== undefined) {
+                const gross = num(out.gross_sales);
+                out.net_sales = Math.max(0,
+                    gross - num(out.discount) - num(out.refund) - num(out.void)
+                );
+            }
+            if (!out.quantity && out.unit_price && out.net_sales) {
+                const price = num(out.unit_price);
+                if (price > 0) out.quantity = num(out.net_sales) / price;
+            }
+            if (!out.gross_sales && out.quantity && out.unit_price) {
+                out.gross_sales = num(out.quantity) * num(out.unit_price);
+            }
+        }
+        if (type === 'purchases' && !out.total && out.quantity && (out.unit_cost || out.unit_price)) {
+            out.total = num(out.quantity) * num(out.unit_cost || out.unit_price);
+        }
+        if (type === 'inventory' && !out.inventory_value && out.closing_quantity && out.unit_cost) {
+            out.inventory_value = num(out.closing_quantity) * num(out.unit_cost);
+        }
+        if (type === 'labor' && !out.labor_cost && out.hours && out.hourly_wage) {
+            out.labor_cost = num(out.hours) * num(out.hourly_wage);
+        }
+        if (type === 'guests' && !out.served_covers && out.seats_used) {
+            out.served_covers = num(out.seats_used);
+        }
+        if (type === 'reservations' && !out.party_size && out.customer_id) {
+            out.party_size = 1;
+        }
+        return out;
+    }).map(row => {
+        if (row.location == null && row.location_id != null) row.location = row.location_id;
+        return row;
+    });
+}
+
+function importFingerprint(row, type) {
+    const keyFields = {
+        sales: ['date','order_id','item_id','item_name','quantity','net_sales'],
+        sales_orders: ['date','order_id','guest_count','net_sales'],
+        purchases: ['date','invoice_id','vendor','ingredient','quantity','total'],
+        inventory: ['date','location','ingredient','ingredient_id','closing_quantity'],
+        labor: ['date','employee','role','hours','labor_cost'],
+        expenses: ['date','vendor','category','description','amount'],
+        guests: ['date','time','served_covers','walk_ins','turned_away'],
+        reservations: ['reservation_date','booking_id','customer_id','party_size','status'],
+        waste: ['date','ingredient','quantity','reason','cost'],
+        recipes: ['menu_item','ingredient','quantity','unit'],
+        menu: ['item_id','item_name','price']
+    };
+    const fields = keyFields[type] || Object.keys(row).slice(0, 8);
+    return fields.map(k => norm(row[k] ?? '')).join('|');
+}
+
+function duplicateStats(rows, type) {
+    const existing = new Set((app.db[type] || []).map(row => importFingerprint(row, type)));
+    const seen = new Set();
+    let existingCount = 0;
+    let internalCount = 0;
+    rows.forEach(row => {
+        const fp = importFingerprint(row, type);
+        if (existing.has(fp)) existingCount++;
+        else if (seen.has(fp)) internalCount++;
+        seen.add(fp);
+    });
+    return { existingCount, internalCount, uniqueCount: Math.max(0, rows.length - existingCount - internalCount) };
+}
+
+function importValidation(rows, type, mapping) {
+    const rules = {
+        sales: [['date', 'Date'], ['quantity', 'Quantity'], ['net_sales', 'Sales value']],
+        sales_orders: [['date', 'Date'], ['order_id', 'Order ID'], ['net_sales', 'Order value']],
+        purchases: [['date', 'Date'], ['ingredient', 'Ingredient'], ['total', 'Purchase total']],
+        inventory: [['date', 'Date'], ['ingredient', 'Ingredient'], ['quantity', 'Stock quantity']],
+        labor: [['date', 'Date'], ['hours', 'Hours'], ['labor_cost', 'Labor cost']],
+        expenses: [['date', 'Date'], ['amount', 'Expense amount']],
+        guests: [['date', 'Date'], ['served_covers', 'Served covers']],
+        reservations: [['reservation_date', 'Reservation date'], ['party_size', 'Party size']],
+        waste: [['date', 'Date'], ['ingredient', 'Ingredient'], ['cost', 'Waste cost']],
+        recipes: [['menu_item', 'Menu item'], ['ingredient', 'Ingredient'], ['quantity', 'Quantity'], ['unit_cost', 'Unit cost']],
+        menu: [['item_name', 'Menu item'], ['price', 'Price']]
+    };
+    const issues = [];
+    const warnings = [];
+    const ruleSet = rules[type] || [];
+    for (const [field, label] of ruleSet) {
+        const values = rows.map(r => r[field]).filter(v => v !== '' && v != null);
+        if (!values.length) issues.push(`${label} could not be mapped or derived.`);
+    }
+    const dates = rows.length ? rows.filter(r => parseDate(r.date || r.reservation_date)).length / rows.length : 0;
+    if (type === 'sales' && dates < .85) warnings.push(`Only ${Math.round(dates * 100)}% of rows have recognizable dates.`);
+    if (type === 'sales' && !mapping.gross_sales && !mapping.net_sales) warnings.push('No sales amount column is mapped; revenue cannot be calculated.');
+    if (type === 'purchases' && !mapping.total && !(mapping.quantity && (mapping.unit_cost || mapping.unit_price))) warnings.push('Purchase total is not mapped and cannot be derived safely.');
+    if (type === 'labor' && !mapping.labor_cost && !(mapping.hours && mapping.hourly_wage)) warnings.push('Labor cost is not mapped and cannot be derived safely.');
+    return { issues, warnings, ok: issues.length === 0 };
+}
+
+function mappingProfileFromJob(job) {
+    const mapping = {};
+    Object.entries(job.mapping).forEach(([target, source]) => {
+        if (source) mapping[source] = target;
+    });
+    return mapping;
+}
+
+function saveProfileFromJob(job, name) {
+    if (!name) return false;
+    const profiles = Array.isArray(app.settings.importProfiles) ? app.settings.importProfiles : [];
+    const filteredProfiles = profiles.filter(p => !(p.name === name && p.type === job.type));
+    app.settings.importProfiles = filteredProfiles.concat({
+        name,
+        type: job.type,
+        mapping: mappingProfileFromJob(job),
+        columns: job.keys
+    });
+    saveState();
+    return true;
+}
+
+function mappingOptions(job, target) {
+    const selected = job.mapping[target] || '';
+    return ['<option value="">— Not mapped —</option>', ...job.keys.map(source => {
+        const score = Math.round(semanticScore(source, target, job.rows));
+        return `<option value="${esc(source)}" ${source === selected ? 'selected' : ''}>${esc(source)} · ${score}%</option>`;
+    })].join('');
+}
+
+function renderImportWizard(job) {
+    const mapped = deriveImportRows(job.rows, job.type, job.mapping);
+    const validation = importValidation(mapped, job.type, job.mapping);
+    job.mapped = mapped;
+    job.validation = validation;
+    job.dupes = duplicateStats(mapped, job.type);
+
+    const targetFields = (CORE[job.type] || []).filter(field =>
+        ['date','reservation_date','order_id','item_id','item_name','ingredient','quantity','unit_price','gross_sales','net_sales','discount','refund','void','guest_count','employee','vendor','total','unit_cost','closing_quantity','labor_cost','hours','hourly_wage','amount','served_covers','party_size','status','cost','price','ingredient_cost','category','channel','order_type','location'].includes(field)
+    );
+
+    const topRows = mapped.slice(0, 5);
+    const sampleFields = targetFields.slice(0, 10);
+    const derived = [];
+    if (job.type === 'sales' && !job.mapping.net_sales && job.mapping.gross_sales) derived.push('net_sales from gross − discount − refund − void');
+    if (job.type === 'sales' && !job.mapping.gross_sales && job.mapping.quantity && job.mapping.unit_price) derived.push('gross_sales from quantity × unit_price');
+    if (job.type === 'purchases' && !job.mapping.total && job.mapping.quantity && (job.mapping.unit_cost || job.mapping.unit_price)) derived.push('purchase total from quantity × unit cost');
+    if (job.type === 'labor' && !job.mapping.labor_cost && job.mapping.hours && job.mapping.hourly_wage) derived.push('labor_cost from hours × hourly wage');
+    if (job.type === 'inventory' && !job.mapping.inventory_value && job.mapping.closing_quantity && job.mapping.unit_cost) derived.push('inventory value from closing quantity × unit cost');
+
+    $('modalTitle').textContent = `Import review · ${job.label}`;
+    $('modalBody').innerHTML = `
+<div class="import-summary">
+<div class="import-stat"><span>Rows</span><strong>${job.rows.length.toLocaleString()}</strong></div>
+<div class="import-stat"><span>Detected type</span><strong>${esc(job.type)}</strong></div>
+<div class="import-stat"><span>Confidence</span><strong>${job.confidence}%</strong></div>
+<div class="import-stat"><span>Duplicate rows</span><strong>${job.dupes.existingCount + job.dupes.internalCount}</strong></div>
+</div>
+<div class="field" style="margin:10px 0">
+<label>Dataset type — change this if the POS export was detected incorrectly</label>
+<select id="importTypeSelect">
+${KEYS.filter(k => IMPORT_SIGNAL[k]).map(k => `<option value="${k}" ${k === job.type ? 'selected' : ''}>${k}</option>`).join('')}
+</select>
+</div>
+<div class="notice" style="margin-bottom:10px">
+Aznur reads the raw file locally, maps it into the restaurant's canonical schema, derives safe fields when mathematically possible, and previews the result before saving.
+</div>
+<div class="tablewrap">
+<table class="table compact import-map-table">
+<thead><tr><th>Aznur field</th><th>Uploaded column</th><th>Sample</th></tr></thead>
+<tbody>
+${targetFields.map(target => {
+        const source = job.mapping[target];
+        const sample = source ? sampleValues(job.rows, source, 3).join(' • ') : '';
+        return `<tr>
+<td><strong>${esc(target)}</strong></td>
+<td><select class="import-map" data-target="${esc(target)}">${mappingOptions(job, target)}</select></td>
+<td>${esc(sample)}</td>
+</tr>`;
+    }).join('')}
+</tbody>
+</table>
+</div>
+<div class="grid two" style="margin-top:10px">
+<div class="card" style="box-shadow:none">
+<h4>Validation</h4>
+${validation.ok ? '<div class="successbox">Required fields are mapped or derivable.</div>' : `<div class="dangerbox">${validation.issues.map(x => `<div>${esc(x)}</div>`).join('')}</div>`}
+${validation.warnings.length ? `<div class="warning" style="margin-top:8px">${validation.warnings.map(x => `<div>${esc(x)}</div>`).join('')}</div>` : ''}
+${derived.length ? `<div class="notice" style="margin-top:8px"><strong>Derived automatically:</strong><br>${derived.map(x => esc(x)).join('<br>')}</div>` : ''}
+</div>
+<div class="card" style="box-shadow:none">
+<h4>Duplicate protection</h4>
+<div class="metric-list">
+<div class="metric-row"><span>New rows</span><strong>${job.dupes.uniqueCount.toLocaleString()}</strong></div>
+<div class="metric-row"><span>Already loaded</span><strong>${job.dupes.existingCount.toLocaleString()}</strong></div>
+<div class="metric-row"><span>Repeated inside file</span><strong>${job.dupes.internalCount.toLocaleString()}</strong></div>
+</div>
+<label class="check-row" style="margin-top:9px"><input type="checkbox" id="importAllDuplicates"><span>Import duplicates anyway</span></label>
+<div class="smalltext muted" style="margin-top:7px">Default behavior skips exact duplicate fingerprints so overlapping POS exports do not double-count sales.</div>
+</div>
+</div>
+<div class="card" style="margin-top:10px;box-shadow:none">
+<h4>Preview</h4>
+<div class="tablewrap">
+<table class="table compact">
+<thead><tr>${sampleFields.map(f => `<th>${esc(f)}</th>`).join('')}</tr></thead>
+<tbody>${topRows.map(row => `<tr>${sampleFields.map(f => `<td>${esc(row[f] ?? '')}</td>`).join('')}</tr>`).join('')}</tbody>
+</table>
+</div>
+</div>
+<div class="toolbar" style="margin-top:12px;justify-content:flex-end">
+<input id="importProfileName" class="btn" placeholder="Optional profile name">
+<button class="btn" id="skipImport">Skip</button>
+<button class="btn primary" id="confirmImport" ${validation.ok ? '' : 'disabled'}>Import ${job.dupes.uniqueCount.toLocaleString()} rows</button>
+</div>`;
+
+    document.querySelectorAll('.import-map').forEach(select => {
+        select.onchange = () => {
+            job.mapping[select.dataset.target] = select.value || undefined;
+            job.mapping = Object.fromEntries(Object.entries(job.mapping).filter(([,v]) => v));
+            renderImportWizard(job);
+        };
+    });
+    $('importTypeSelect').onchange = () => {
+        job.type = $('importTypeSelect').value;
+        job.mapping = bestMapping(job.rows, job.type);
+        job.confidence = inferTypeSmart(job.label, job.rows).confidence;
+        renderImportWizard(job);
+    };
+    $('skipImport').onclick = () => finishImportJob(false);
+    $('confirmImport').onclick = () => finishImportJob(true);
+}
+
+function finishImportJob(accepted) {
+    const job = IMPORT_STATE.current;
+    if (!job) return;
+    if (accepted) {
+        const mapped = deriveImportRows(job.rows, job.type, job.mapping).filter(row => Object.values(row).some(v => String(v ?? '').trim() !== ''));
+        const stats = duplicateStats(mapped, job.type);
+        const importAll = !!$('importAllDuplicates')?.checked;
+        const existing = new Set((app.db[job.type] || []).map(row => importFingerprint(row, job.type)));
+        const seen = new Set();
+        const finalRows = importAll ? mapped : mapped.filter(row => {
+            const fp = importFingerprint(row, job.type);
+            if (existing.has(fp) || seen.has(fp)) return false;
+            seen.add(fp);
+            return true;
+        });
+
+        app.db[job.type].push(...finalRows);
+        app.settings.demo = false;
+        invalidate();
+        refreshLocations();
+        saveState();
+
+        const profileName = $('importProfileName')?.value.trim();
+        if (profileName) saveProfileFromJob(job, profileName);
+
+        const q = $('importQueue');
+        if (q) {
+            const d = document.createElement('div');
+            d.className = 'successbox';
+            d.innerHTML = `<strong>${esc(job.label)}</strong> → ${esc(job.type)} · ${finalRows.length.toLocaleString()} rows imported${stats.existingCount ? ` · ${stats.existingCount} duplicates skipped` : ''}`;
+            q.appendChild(d);
+        }
+    } else {
+        const q = $('importQueue');
+        if (q) {
+            const d = document.createElement('div');
+            d.className = 'warning';
+            d.textContent = `${job.label}: skipped.`;
+            q.appendChild(d);
+        }
+    }
+
+    IMPORT_STATE.current = null;
+    closeModal();
+    processNextImport();
+}
+
+function processNextImport() {
+    const next = IMPORT_STATE.queue.shift();
+    if (!next) {
+        invalidate();
+        refreshLocations();
+        render();
+        toast('Import queue complete');
+        return;
+    }
+    IMPORT_STATE.current = next;
+    renderImportWizard(next);
+    $("modal").classList.add("show");
+    $("modal").setAttribute("aria-hidden", "false");
+}
+
+async function readImportFile(file) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (ext === 'csv' || ext === 'txt') {
+        const text = await file.text();
+        const rows = parseCsv(text);
+        return [{ label: file.name, rows }];
+    }
+    if (ext === 'json') {
+        let value = JSON.parse(await file.text());
+        value = Array.isArray(value) ? value : (value.rows || value.data || []);
+        return [{ label: file.name, rows: value }];
+    }
+    if (!window.XLSX) throw new Error('XLSX library did not load. CSV and JSON imports still work without it.');
+    const wb = XLSX.read(await file.arrayBuffer(), { type: 'array' });
+    const jobs = [];
+    for (const sheetName of wb.SheetNames) {
+        if (IGNORE.has(sheetName)) continue;
+        const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { defval: '' });
+        if (rows.length) jobs.push({ label: `${file.name} / ${sheetName}`, rows });
+    }
+    return jobs;
+}
+
+function makeImportJobs(label, rows) {
+    if (!rows.length) return [];
+    const detected = inferTypeSmart(label, rows);
+    return [{
+        label,
+        rows,
+        keys: Object.keys(rows[0] || {}),
+        type: detected.type,
+        confidence: detected.confidence,
+        mapping: bestMapping(rows, detected.type)
+    }];
+}
+
+async function handleFiles(files) {
+    const q = $('importQueue');
+    if (q) q.innerHTML = '';
+    IMPORT_STATE.queue = [];
+    for (const file of [...files]) {
+        try {
+            const sheets = await readImportFile(file);
+            sheets.forEach(sheet => IMPORT_STATE.queue.push(...makeImportJobs(sheet.label, sheet.rows)));
+            if (!sheets.length && q) {
+                const d = document.createElement('div');
+                d.className = 'warning';
+                d.textContent = `${file.name}: no rows found.`;
+                q.appendChild(d);
+            }
+        } catch (error) {
+            if (q) {
+                const d = document.createElement('div');
+                d.className = 'dangerbox';
+                d.textContent = `${file.name}: ${error.message}`;
+                q.appendChild(d);
+            }
+        }
+    }
+    processNextImport();
+}
+
+function parseCsv(text) {
+    const clean = text.replace(/^\uFEFF/, '');
+    const first = clean.split(/\r?\n/, 1)[0] || '';
+    const delimiters = [',', '\t', ';', '|'];
+    const delimiter = delimiters.sort((a, b) => {
+        const aa = (first.match(new RegExp(`\\${a === '\\t' ? 't' : a}`, 'g')) || []).length;
+        const bb = (first.match(new RegExp(`\\${b === '\\t' ? 't' : b}`, 'g')) || []).length;
+        return bb - aa;
+    })[0];
+    const rows = [];
+    let row = [], cell = '', quote = false;
+    for (let i = 0; i < clean.length; i++) {
+        const c = clean[i], n = clean[i + 1];
+        if (c === '"') {
+            if (quote && n === '"') {
+                cell += '"';
+                i++;
+            } else quote = !quote;
+        } else if (c === delimiter && !quote) {
+            row.push(cell);
+            cell = '';
+        } else if ((c === '\n' || c === '\r') && !quote) {
+            if (c === '\r' && n === '\n') i++;
+            row.push(cell);
+            cell = '';
+            if (row.some(x => String(x).trim() !== '')) rows.push(row);
+            row = [];
+        } else {
+            cell += c;
+        }
+    }
+    row.push(cell);
+    if (row.some(x => String(x).trim() !== '')) rows.push(row);
+    if (!rows.length) return [];
+    const headers = rows[0].map((x, i) => String(x).trim() || `Column_${i + 1}`);
+    return rows.slice(1).map(values => Object.fromEntries(
+        headers.map((header, i) => [header, values[i] ?? ''])
+    ));
+}
+function csv(rows) { if (!rows.length)
+    return ""; const keys = [...new Set(rows.flatMap(r => Object.keys(r)))]; const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`; return [keys.map(q).join(","), ...rows.map(r => keys.map(k => q(r[k])).join(","))].join("\n"); }
+function download(name, content, type = "text/plain") { const a = document.createElement("a"),
+   u = URL.createObjectURL(new Blob([content], { type })); a.href = u; a.download = name;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 800); }
+/* ============================================================
+   NORMALIZED DATA + ANALYTICS
+   ============================================================ */
+function salesRows() { return cache("sales", () => filtered("sales").map(r => ({ ...r, date: dateKey(r.date),
+   quantity: num(r.quantity), unit_price: num(r.unit_price), gross_sales: num(r.gross_sales ?? r.sales),
+      discount: num(r.discount), refund: num(r.refund), void: num(r.void),
+         net_sales: num(r.net_sales ?? r.gross_sales ?? r.sales ?? r.total),
+            guest_count: num(r.guest_count) })).filter(r => r.date)); }
+function purchaseTotal(r) { const t = num(r.total); if (t)
+    return t; return Math.max(0,
+       num(r.quantity) * num(r.unit_price || r.unit_cost) - num(r.discount) + num(r.tax)); }
+function purchaseRows() { return cache("purchases", () => filtered("purchases").map(r => ({ ...r,
+   date: dateKey(r.date), quantity: num(r.quantity), unit_cost: num(r.unit_cost ?? r.unit_price),
+      unit_price: num(r.unit_price), total: purchaseTotal(r), ingredient: r.ingredient || r.ingredient_id || "",
+         vendor: r.vendor || "" })).filter(r => r.date)); }
+function laborRows() { return cache("labor",
+   () => filtered("labor").map(r => { const h = num(r.hours ?? r.regular_hours), w = num(r.hourly_wage);
+      return { ...r, date: dateKey(r.date), hours: h, hourly_wage: w, labor_cost: num(r.labor_cost) || h * w,
+         role: r.role || "Unspecified" }; }).filter(r => r.date)); }
+function expenseRows() { return cache("expenses", () => filtered("expenses").map(r => ({ ...r,
+   date: dateKey(r.date), amount: num(r.amount), category: r.category || "Other" })).filter(r => r.date)); }
+function guestRows() { return cache("guests", () => filtered("guests").map(r => ({ ...r, date: dateKey(r.date),
+   served_covers: num(r.served_covers ?? r.seats_used), walk_ins: num(r.walk_ins),
+      reservation_covers: num(r.reservation_covers), turned_away: num(r.turned_away), no_shows: num(r.no_shows),
+         tables_used: num(r.tables_used) })).filter(r => r.date)); }
+function wasteRows() { return cache("waste", () => filtered("waste").map(r => ({ ...r, date: dateKey(r.date),
+   quantity: num(r.quantity), cost: num(r.cost) })).filter(r => r.date)); }
+function dailySales() { return cache("daily", () => { const m = new Map(); const add = (d, s,
+   c) => { const x = m.get(d) || { date: d, sales: 0, covers: 0, orders: new Set() }; x.sales += s;
+      x.covers += c; m.set(d, x); return x; }; salesRows().forEach(r => { const x = add(r.date, r.net_sales,
+         r.guest_count); if (r.order_id)
+    x.orders.add(String(r.order_id)); }); filtered("sales_orders").forEach(r => { const d = dateKey(r.date);
+       if (!d)
+    return; const x = add(d, 0, num(r.guest_count)); if (r.order_id)
+    x.orders.add(String(r.order_id)); }); return [...m.values()].map(x => ({ ...x,
+       orders: x.orders.size })).sort((a, b) => a.date.localeCompare(b.date)); }); }
+function rangeDays() { const d = dailySales(); if (!d.length)
+    return 30; return Math.max(1, Math.round((parseDate(d.at(-1).date) - parseDate(d[0].date)) / 86400000) + 1);
+       }
+function recent(n = 30) { return dailySales().slice(-n); }
+function revenue() { return salesRows().reduce((s, r) => s + r.net_sales, 0); }
+function covers() { const s = salesRows().reduce((a, r) => a + r.guest_count, 0);
+   return s || guestRows().reduce((a, r) => a + r.served_covers, 0); }
+function orders() { const ids = new Set(salesRows().map(r => r.order_id).filter(Boolean).map(String));
+   return ids.size || dailySales().reduce((a, r) => a + r.orders, 0); }
+function labor() { return laborRows().reduce((s, r) => s + r.labor_cost, 0); }
+function opex() { return expenseRows().reduce((s, r) => s + r.amount, 0); }
+function avgCheck() { const c = covers();
+   return c ? revenue() / c : (app.settings.currency === "BDT" ? 300 : 10); }
+function recipeCost(name) { return cache(`rc:${String(name).toLowerCase()}`, () => { const key = String(name || "").trim().toLowerCase(); const rows = app.db.recipes.filter(r => String(r.menu_item || "").trim().toLowerCase() === key); if (!rows.length) {
+    const m = app.db.menu.find(r => String(r.item_name || "").trim().toLowerCase() === key);
+    return num(m?.ingredient_cost);
+} return rows.reduce((s, r) => { const y = num(r.yield_pct || 100) / 100; const cost = num(r.quantity) * num(r.unit_cost); return s + (y ? cost / y : cost); }, 0); }); }
+function menuAnalysis() { return cache("menuAnalysis", () => { const m = new Map(); salesRows().forEach(r => { const name = r.item_name || r.item_id || "Unknown"; const x = m.get(name) || { name, category: r.category || "Other", qty: 0, revenue: 0 }; x.qty += r.quantity || 1; x.revenue += r.net_sales; m.set(name, x); }); const a = [...m.values()].map(x => { const cost = recipeCost(x.name), cm = x.revenue - cost * x.qty; return { ...x, cost, price: x.qty ? x.revenue / x.qty : 0, cm, cmPerUnit: x.qty ? cm / x.qty : 0, foodPct: x.revenue ? cost * x.qty / x.revenue * 100 : 0 }; }); const med = (v) => v.length ? v.sort((a, b) => a - b)[Math.floor(v.length / 2)] : 0; const mq = med(a.map(x => x.qty)), mc = med(a.map(x => x.cmPerUnit)); return a.map(x => ({ ...x, class: x.qty >= mq ? (x.cmPerUnit >= mc ? "Star" : "Workhorse") : (x.cmPerUnit >= mc ? "Puzzle" : "Dog") })).sort((a, b) => b.cm - a.cm); }); }
+function theoreticalCOGS() { return menuAnalysis().reduce((s, x) => s + x.cost * x.qty, 0); }
+function cogsWindow() {
+    const d = dailySales();
+    if (!d.length) return null;
+    return { start: d[0].date, end: d.at(-1).date };
+}
+
+function cogsReconciliation() {
+    return cache("cogsReconciliation", () => {
+        const win = cogsWindow();
+        const purchases = purchaseRows().filter(x => {
+            return !win || x.date >= win.start && x.date <= win.end;
+        });
+        const inventory = filtered("inventory")
+            .map(x => ({
+                ...x,
+                date: dateKey(x.date),
+                ingredient: String(
+                    x.ingredient || x.ingredient_id || "Unknown"
+                ).trim(),
+                qty: num(x.closing_quantity ?? x.quantity),
+                unitCost: num(x.unit_cost)
+            }))
+            .filter(x => x.date);
+
+        const groups = new Map();
+        const ensure = name => {
+            const clean = String(name || "Unknown").trim();
+            const key = clean.toLowerCase();
+            const row = groups.get(key) || {
+                ingredient: clean,
+                opening: 0,
+                purchases: 0,
+                closing: 0,
+                theoretical: 0
+            };
+            groups.set(key, row);
+            return row;
+        };
+
+        purchases.forEach(x => {
+            ensure(x.ingredient || "Unknown").purchases += x.total;
+        });
+
+        const snapshots = new Map();
+        inventory.forEach(x => {
+            const key = `${loc(x)}|${x.ingredient.toLowerCase()}`;
+            const row = snapshots.get(key) || {
+                first: null,
+                last: null
+            };
+            if (!row.first || x.date < row.first.date) row.first = x;
+            if (!row.last || x.date > row.last.date) row.last = x;
+            snapshots.set(key, row);
+        });
+
+        snapshots.forEach(row => {
+            const name = row.first?.ingredient || row.last?.ingredient;
+            const target = ensure(name);
+            if (row.first) {
+                target.opening += row.first.qty * row.first.unitCost;
+            }
+            if (row.last) {
+                target.closing += row.last.qty * row.last.unitCost;
+            }
+        });
+
+        salesRows().forEach(sale => {
+            if (win && (sale.date < win.start || sale.date > win.end)) return;
+            const item = String(
+                sale.item_name || sale.item_id || ""
+            ).trim().toLowerCase();
+            app.db.recipes.forEach(recipe => {
+                if (String(recipe.menu_item || "").trim().toLowerCase() !== item) {
+                    return;
+                }
+                const yieldPct = num(recipe.yield_pct || 100) / 100 || 1;
+                const qty = num(recipe.quantity) * sale.quantity;
+                const value = num(recipe.unit_cost) * qty / yieldPct;
+                ensure(recipe.ingredient || recipe.ingredient_id || "Unknown")
+                    .theoretical += value;
+            });
+        });
+
+        let opening = 0;
+        let purchasesTotal = 0;
+        let closing = 0;
+        let theoretical = 0;
+
+        const rows = [...groups.values()].map(x => {
+            const actual = Math.max(0, x.opening + x.purchases - x.closing);
+            const variance = actual - x.theoretical;
+            opening += x.opening;
+            purchasesTotal += x.purchases;
+            closing += x.closing;
+            theoretical += x.theoretical;
+            return {
+                ...x,
+                actual,
+                variance,
+                variancePct: x.theoretical
+                    ? variance / x.theoretical * 100
+                    : null
+            };
+        });
+
+        const actual = Math.max(
+            0,
+            opening + purchasesTotal - closing
+        );
+
+        return {
+            rows: rows.sort(
+                (a, b) => Math.abs(b.variance) - Math.abs(a.variance)
+            ),
+            opening,
+            purchases: purchasesTotal,
+            closing,
+            actual,
+            theoretical,
+            variance: actual - theoretical,
+            start: win?.start || "",
+            end: win?.end || ""
+        };
+    });
+}
+
+function actualCOGS() {
+    return cogsReconciliation().actual;
+}
+
+function inventoryRows() { return cache("inventoryRows", () => { const usage = new Map(), days = Math.max(1, rangeDays()), recipeMap = new Map(); app.db.recipes.forEach(r => { const k = String(r.menu_item || "").trim().toLowerCase(); if (!k)
+    return; const a = recipeMap.get(k) || []; a.push(r); recipeMap.set(k, a); }); salesRows().forEach(s => { const rs = recipeMap.get(String(s.item_name || s.item_id || "").trim().toLowerCase()) || []; rs.forEach(r => { const k = String(r.ingredient || r.ingredient_id || "Unknown").trim().toLowerCase(); usage.set(k, (usage.get(k) || 0) + num(r.quantity) * s.quantity / days); }); }); const latest = new Map(); filtered("inventory").forEach(r => { const date = dateKey(r.date); if (!date)
+    return; const ingredient = String(r.ingredient || r.ingredient_id || "Unknown"); const item = { ...r, date, ingredient, qty: num(r.closing_quantity ?? r.quantity), unit: r.unit || "", unitCost: num(r.unit_cost), value: num(r.inventory_value) || num(r.closing_quantity ?? r.quantity) * num(r.unit_cost), expiry: r.expiry_date || "" }; const k = `${loc(r)}|${ingredient.toLowerCase()}`, old = latest.get(k); if (!old || date > old.date)
+    latest.set(k, item); }); return [...latest.values()].map(r => { const u = usage.get(r.ingredient.toLowerCase()) || 0, dh = u ? r.qty / u : 999; return { ...r, usage: u, days: dh, status: dh < 1 ? "ORDER NOW" : dh < 3 ? "ORDER SOON" : "OK" }; }).sort((a, b) => a.days - b.days); }); }
+function forecast(h = 28) { return cache(`forecast:${h}`, () => { const hist = dailySales(); if (!hist.length)
+    return { hist: [], future: [], method: "No data", mae: null, wape: null, bias: 0 }; const v = hist.map(x => x.sales), n = v.length, season = n >= 14 ? 7 : Math.min(3, n), recentV = v.slice(-Math.min(7, n)), mean = recentV.reduce((a, b) => a + b, 0) / recentV.length; let slope = 0; if (recentV.length >= 4) {
+    const xm = (recentV.length - 1) / 2;
+    let nume = 0, den = 0;
+    recentV.forEach((y, i) => { nume += (i - xm) * (y - mean); den += (i - xm) ** 2; });
+    slope = den ? nume / den : 0;
+} const future = []; for (let i = 1; i <= h; i++) {
+    const d = addDays(parseDate(hist.at(-1).date), i), si = n - season + (i - 1) % season, sea = si >= 0 ? v[si] : mean, tr = Math.max(0, mean + slope * i), p = Math.max(0, season >= 3 ? sea * .62 + tr * .38 : tr);
+    future.push({ date: dateKey(d), sales: p, dow: d.getDay(), lo: p * .82, hi: p * 1.18 });
+} const test = Math.min(7, Math.max(0, n - 7)), errs = [], act = []; let bias = 0; for (let i = n - test; i < n; i++) {
+    const past = v.slice(0, i), look = Math.min(season, past.length), p = look ? past.slice(-look).reduce((a, b) => a + b, 0) / look : mean;
+    errs.push(Math.abs(v[i] - p));
+    act.push(Math.abs(v[i]));
+    bias += p - v[i];
+} const mae = errs.length ? errs.reduce((a, b) => a + b, 0) / errs.length : null, wape = act.reduce((a, b) => a + b, 0) ? errs.reduce((a, b) => a + b, 0) / act.reduce((a, b) => a + b, 0) * 100 : null; return { hist, future, method: season === 7 ? "7-day seasonality + moving average" : "Moving average + short trend", mae, wape, bias: test ? bias / test : 0 }; }); }
+function breakEven() { const r = revenue(), variable = r ? Math.min(.95, (theoreticalCOGS() + labor()) / r) : .5, cmr = Math.max(.05, 1 - variable), fixed = opex() + app.settings.fixedMonthly, sales = fixed / cmr; return { cmr, breakEvenSales: sales, breakEvenGuests: sales / Math.max(1, avgCheck()) }; }
+function actions() { return cache("actions", () => { const a = [], inv = inventoryRows(), m = menuAnalysis(), f = forecast(7), r = revenue(), l = labor(), t = theoreticalCOGS(), ac = actualCOGS(); inv.filter(x => x.status === "ORDER NOW").slice(0, 3).forEach(x => a.push({ level: "bad", text: `Order ${x.ingredient} — projected stock ${x.days.toFixed(1)} days.` })); m.filter(x => x.class === "Dog").slice(0, 2).forEach(x => a.push({ level: "warn", text: `Review ${x.name}: low popularity and contribution.` })); if (t && ac > t * 1.12)
+    a.push({ level: "warn", text: `Actual COGS is above theoretical COGS by ${money(ac - t)}.` }); if (r && l / r * 100 > app.settings.laborTarget)
+    a.push({ level: "warn", text: `Labor is ${percent(l / r * 100)},
+       above the ${percent(app.settings.laborTarget)} target.` }); if (f.wape != null && f.wape > 25)
+    a.push({ level: "info", text: `Forecast error is high (${percent(f.wape)} WAPE);
+       add more history.` }); return a; }); }
+function quality() { return cache("quality", () => { let score = 100; const issues = [], s = salesRows(); if (!app.db.sales.length) {
+    score -= 35;
+    issues.push("Sales dataset missing.");
+}
+else {
+    if (!s.length) {
+        score -= 20;
+        issues.push("Sales dates could not be parsed.");
+    }
+    if (!s.some(x => x.guest_count)) {
+        score -= 7;
+        issues.push("Guest counts are missing from sales.");
+    }
+} if (!app.db.purchases.length) {
+    score -= 8;
+    issues.push("Purchases are missing; actual COGS is less complete.");
+} if (!app.db.recipes.length && !app.db.menu.length) {
+    score -= 10;
+    issues.push("Recipes/menu costs are missing; theoretical COGS is incomplete.");
+} if (!app.db.inventory.length) {
+    score -= 5;
+    issues.push("Inventory counts are missing.");
+} if (!app.db.labor.length) {
+    score -= 7;
+    issues.push("Labor data is missing.");
+} if (!app.db.expenses.length) {
+    score -= 5;
+    issues.push("Operating expense data is missing.");
+} if (!issues.length)
+    issues.push("Core datasets present. Validate mappings and units before making decisions."); return { score: Math.max(0, score), issues }; }); }
+/* ============================================================
+   CHARTS
+   ============================================================ */
+const COLORS = { accent: "#f59e0b", accent2: "#d97706", green: "#10b981", red: "#ef4444", dim: "#78716c", grid: "#eeeae7" };
+function chart(id, type, data, extra = {}) { if (!window.Chart)
+    return; const el = $(id); if (!el)
+    return; const old = app.charts.get(id); if (old)
+    old.destroy(); app.charts.set(id, new Chart(el, { type, data, options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { display: !!extra.legend, position: "bottom", labels: { boxWidth: 8, font: { size: 9 } } }, tooltip: { mode: "index", intersect: false } }, scales: { x: { grid: { display: false }, ticks: { font: { size: 8 } } }, y: { grid: { color: COLORS.grid }, ticks: { font: { size: 8 } } }, }, ...extra } })); }
+/* ============================================================
+   VIEW TEMPLATES
+   ============================================================ */
+function viewHtml(view) {
+    const common = {
+        operations: `<section class="view" id="view-operations">
+<div class="pagehead">
+<div>
+<h3>Daily operations</h3>
+<p>Turn tomorrow's forecast into prep, purchasing, staffing and a simple daily close.</p>
+</div>
+<div class="toolbar">
+<span class="pill" id="opsDateLabel"></span>
+<button class="btn small" id="printOps">Print operations brief</button>
+</div>
+</div>
+<div class="action-grid" id="opsKpis"></div>
+<div class="grid two" style="margin-top:12px">
+<div class="card">
+<h4>Morning brief</h4>
+<div id="morningBrief"></div>
+</div>
+<div class="card">
+<h4>Owner action board</h4>
+<div id="opsActions"></div>
+</div>
+</div>
+<div class="grid two" style="margin-top:12px">
+<div class="card">
+<h4>Kitchen prep sheet</h4>
+<div class="toolbar" style="margin-bottom:9px">
+<button class="btn small" id="exportPrep">Export prep CSV</button>
+</div>
+<div class="tablewrap">
+<table class="table compact" id="prepTable"></table>
+</div>
+</div>
+<div class="card">
+<h4>Purchasing list</h4>
+<div class="toolbar" style="margin-bottom:9px">
+<button class="btn small" id="exportOrder">Export order CSV</button>
+</div>
+<div class="tablewrap">
+<table class="table compact" id="orderTable"></table>
+</div>
+</div>
+</div>
+<div class="grid two" style="margin-top:12px">
+<div class="card">
+<h4>Demand-aware staffing</h4>
+<div id="staffPlan"></div>
+</div>
+<div class="card">
+<h4>Daily close</h4>
+<div id="dailyClose"></div>
+</div>
+</div>
+</section>`,
+        control: `<section class="view" id="view-control">
+<div class="pagehead">
+<div>
+<h3>Margin control</h3>
+<p>Reconcile food usage, supplier price movement and the changes that explain profit.</p>
+</div>
+<div class="toolbar">
+<button class="btn small" id="exportVariance">Export variance CSV</button>
+<button class="btn small" id="refreshControl">Recalculate</button>
+</div>
+</div>
+<div class="grid four" id="controlKpis"></div>
+<div class="grid two" style="margin-top:12px">
+<div class="card">
+<h4>COGS reconciliation</h4>
+<div id="cogsSummary"></div>
+<div class="tablewrap" style="margin-top:10px">
+<table class="table compact" id="cogsTable"></table>
+</div>
+</div>
+<div class="card">
+<h4>Supplier price watch</h4>
+<div id="supplierWatch"></div>
+</div>
+</div>
+<div class="grid two" style="margin-top:12px">
+<div class="card">
+<h4>What changed?</h4>
+<div id="changeTable"></div>
+</div>
+<div class="card">
+<h4>Restaurant control score</h4>
+<div id="controlScore"></div>
+</div>
+</div>
+</section>`,
+        dashboard: `<section class="view active" id="view-dashboard">
+<div class="pagehead">
+<div>
+<h3>Restaurant overview</h3>
+<p>Sales, guests, margin, cash pressure and tomorrow's operating picture.</p>
+</div>
+<div class="toolbar">
+<span class="pill" id="periodLabel">Last 30 days</span>
+<button class="btn small" id="refreshBtn">Refresh</button>
+</div>
+</div>
+<div class="grid kpis" id="dashboardKpis">
+</div>
+<div class="grid two" style="margin-top:12px">
+<div class="card">
+<h4>Revenue trend &amp; forecast</h4>
+<div class="chartbox">
+<canvas id="salesChart">
+</canvas>
+</div>
+</div>
+<div class="card">
+<h4>Business health</h4>
+<div id="healthPanel">
+</div>
+</div>
+</div>
+<div class="grid three" style="margin-top:12px">
+<div class="card">
+<h4>Top menu items</h4>
+<div id="topItems">
+</div>
+</div>
+<div class="card">
+<h4>Action queue</h4>
+<div id="actionQueue">
+</div>
+</div>
+<div class="card">
+<h4>Tomorrow planner</h4>
+<div id="tomorrowPanel">
+</div>
+</div>
+</div>
+<div class="grid two" style="margin-top:12px">
+<div class="card">
+<h4>Sales by daypart</h4>
+<div class="chartbox sm">
+<canvas id="daypartChart">
+</canvas>
+</div>
+</div>
+<div class="card">
+<h4>Channel mix</h4>
+<div class="chartbox sm">
+<canvas id="channelChart">
+</canvas>
+</div>
+</div>
+</div>
+</section>`,
+        forecast: `<section class="view" id="view-forecast">
+<div class="pagehead">
+<div>
+<h3>Forecasting &amp; projections</h3>
+<p>Transparent planning forecasts with backtest diagnostics and uncertainty bands.</p>
+</div>
+<div class="toolbar">
+<select id="forecastHorizon" class="btn small">
+<option value="7">7 days</option>
+<option value="14">14 days</option>
+<option value="28" selected>28 days</option>
+<option value="90">90 days</option>
+</select>
+<button class="btn primary small" id="runForecast">Run forecast</button>
+</div>
+</div>
+<div class="grid four" id="forecastKpis">
+</div>
+<div class="grid two" style="margin-top:12px">
+<div class="card">
+<h4>Sales forecast</h4>
+<div class="chartbox tall">
+<canvas id="forecastChart">
+</canvas>
+</div>
+</div>
+<div class="card">
+<h4>Forecast diagnostics</h4>
+<div id="forecastDiagnostics">
+</div>
+</div>
+</div>
+<div class="grid two" style="margin-top:12px">
+<div class="card">
+<h4>Forecast by weekday</h4>
+<div id="weekdayForecast">
+</div>
+</div>
+<div class="card">
+<h4>Planning signals</h4>
+<div id="forecastSignals">
+</div>
+</div>
+</div>
+<div class="notice" style="margin-top:12px">Forecasts are planning estimates based only on loaded data. Weather and events are not invented.</div>
+</section>`,
+        finance: `<section class="view" id="view-finance">
+<div class="pagehead">
+<div>
+<h3>P&amp;L, unit economics &amp; cash</h3>
+<p>Build an operating P&amp;L from imported sales, purchases, labor and expenses.</p>
+</div>
+<div class="toolbar">
+<button class="btn small" id="exportPnl">Export P&amp;L CSV</button>
+<button class="btn small" id="printPnl">Print report</button>
+</div>
+</div>
+<div class="grid four" id="financeKpis">
+</div>
+<div class="grid two" style="margin-top:12px">
+<div class="card">
+<h4>Monthly P&amp;L</h4>
+<div class="tablewrap">
+<table class="table" id="pnlTable">
+</table>
+</div>
+</div>
+<div class="card">
+<h4>Cost structure</h4>
+<div class="chartbox">
+<canvas id="costChart">
+</canvas>
+</div>
+</div>
+</div>
+<div class="grid three" style="margin-top:12px">
+<div class="card">
+<h4>Break-even</h4>
+<div id="breakEven">
+</div>
+</div>
+<div class="card">
+<h4>Cash position</h4>
+<div id="cashPanel">
+</div>
+</div>
+<div class="card">
+<h4>Capital decisions</h4>
+<div id="capexPanel">
+</div>
+</div>
+</div>
+</section>`,
+        menu: `<section class="view" id="view-menu">
+<div class="pagehead">
+<div>
+<h3>Menu engineering</h3>
+<p>Popularity, contribution margin, food cost and pricing opportunities.</p>
+</div>
+<div class="toolbar">
+<button class="btn small" id="addRecipeBtn">Add recipe</button>
+<button class="btn small" id="exportMenu">Export menu analysis</button>
+</div>
+</div>
+<div class="grid two">
+<div class="card">
+<h4>Menu matrix</h4>
+<div class="tablewrap">
+<table class="table" id="menuTable">
+</table>
+</div>
+</div>
+<div class="card">
+<h4>Category economics</h4>
+<div class="chartbox">
+<canvas id="categoryChart">
+</canvas>
+</div>
+</div>
+</div>
+<div class="card" style="margin-top:12px">
+<h4>Pricing &amp; recipe simulator</h4>
+<div id="recipeSimulator">
+</div>
+</div>
+</section>`,
+        inventory: `<section class="view" id="view-inventory">
+<div class="pagehead">
+<div>
+<h3>Inventory intelligence</h3>
+<p>Current stock, days-on-hand, reorder signals and forecast-driven usage.</p>
+</div>
+<div class="toolbar">
+<button class="btn small" id="stockCountBtn">Add stock count</button>
+<button class="btn small" id="exportInventory">Export reorder list</button>
+</div>
+</div>
+<div class="grid four" id="inventoryKpis">
+</div>
+<div class="card" style="margin-top:12px">
+<h4>Ingredient action list</h4>
+<div class="tablewrap">
+<table class="table" id="inventoryTable">
+</table>
+</div>
+</div>
+</section>`,
+        purchasing: `<section class="view" id="view-purchasing">
+<div class="pagehead">
+<div>
+<h3>Purchasing &amp; suppliers</h3>
+<p>Spend concentration, price movement and supplier signals.</p>
+</div>
+</div>
+<div class="grid three" id="purchasingKpis">
+</div>
+<div class="grid two" style="margin-top:12px">
+<div class="card">
+<h4>Supplier spend</h4>
+<div class="chartbox">
+<canvas id="vendorChart">
+</canvas>
+</div>
+</div>
+<div class="card">
+<h4>Price variance signals</h4>
+<div id="supplierSignals">
+</div>
+</div>
+</div>
+<div class="card" style="margin-top:12px">
+<h4>Purchasing summary</h4>
+<div class="tablewrap">
+<table class="table" id="purchaseTable">
+</table>
+</div>
+</div>
+</section>`,
+        labor: `<section class="view" id="view-labor">
+<div class="pagehead">
+<div>
+<h3>Labor &amp; staffing</h3>
+<p>Labor percentage, productivity and demand-aware staffing suggestions.</p>
+</div>
+</div>
+<div class="grid four" id="laborKpis">
+</div>
+<div class="grid two" style="margin-top:12px">
+<div class="card">
+<h4>Sales vs labor</h4>
+<div class="chartbox">
+<canvas id="laborChart">
+</canvas>
+</div>
+</div>
+<div class="card">
+<h4>Staffing recommendation</h4>
+<div id="staffingPanel">
+</div>
+</div>
+</div>
+<div class="card" style="margin-top:12px">
+<h4>Role performance</h4>
+<div class="tablewrap">
+<table class="table" id="roleTable">
+</table>
+</div>
+</div>
+</section>`,
+        customers: `<section class="view" id="view-customers">
+<div class="pagehead">
+<div>
+<h3>Customers, traffic &amp; capacity</h3>
+<p>Covers, average check, reservations, turn-away and capacity economics.</p>
+</div>
+</div>
+<div class="grid four" id="customerKpis">
+</div>
+<div class="grid two" style="margin-top:12px">
+<div class="card">
+<h4>Traffic trend</h4>
+<div class="chartbox">
+<canvas id="trafficChart">
+</canvas>
+</div>
+</div>
+<div class="card">
+<h4>Day-of-week traffic</h4>
+<div id="heatmap">
+</div>
+</div>
+</div>
+<div class="grid three" style="margin-top:12px">
+<div class="card">
+<h4>Capacity economics</h4>
+<div id="capacityPanel">
+</div>
+</div>
+<div class="card">
+<h4>Reservation funnel</h4>
+<div id="reservationPanel">
+</div>
+</div>
+<div class="card">
+<h4>Customer signals</h4>
+<div id="customerSignals">
+</div>
+</div>
+</div>
+</section>`,
+        waste: `<section class="view" id="view-waste">
+<div class="pagehead">
+<div>
+<h3>Waste, theoretical vs actual COGS</h3>
+<p>Recipe usage, purchase price effects, logged waste and inventory variance.</p>
+</div>
+</div>
+<div class="grid four" id="wasteKpis">
+</div>
+<div class="grid two" style="margin-top:12px">
+<div class="card">
+<h4>COGS bridge</h4>
+<div class="chartbox">
+<canvas id="cogsChart">
+</canvas>
+</div>
+</div>
+<div class="card">
+<h4>Loss drivers</h4>
+<div id="lossDrivers">
+</div>
+</div>
+</div>
+<div class="card" style="margin-top:12px">
+<h4>Waste log</h4>
+<div class="tablewrap">
+<table class="table" id="wasteTable">
+</table>
+</div>
+</div>
+</section>`,
+        scenarios: `<section class="view" id="view-scenarios">
+<div class="pagehead">
+<div>
+<h3>Scenario simulator</h3>
+<p>Stress-test sales, costs, labor, pricing and operating assumptions.</p>
+</div>
+<button class="btn primary small" id="runScenario">Run scenario</button>
+</div>
+<div class="grid two">
+<div class="card">
+<h4>Assumptions</h4>
+<div class="formgrid" id="scenarioForm">
+</div>
+</div>
+<div class="card">
+<h4>Scenario result</h4>
+<div id="scenarioResult">
+</div>
+</div>
+</div>
+<div class="card" style="margin-top:12px">
+<h4>Scenario comparison</h4>
+<div class="tablewrap">
+<table class="table" id="scenarioTable">
+</table>
+</div>
+</div>
+</section>`,
+        reports: `<section class="view" id="view-reports">
+<div class="pagehead">
+<div>
+<h3>Reports</h3>
+<p>Print-ready management views generated from current browser data.</p>
+</div>
+<button class="btn primary small" id="printReport">Print current report</button>
+</div>
+<div class="grid three">
+<div class="card">
+<h4>Executive brief</h4>
+<div id="execBrief">
+</div>
+</div>
+<div class="card">
+<h4>Owner actions</h4>
+<div id="reportActions">
+</div>
+</div>
+<div class="card">
+<h4>Data quality</h4>
+<div id="dataQuality">
+</div>
+</div>
+</div>
+<div class="card" style="margin-top:12px">
+<h4>Report export</h4>
+<p class="smalltext muted">Exports are generated locally. No upload is required.</p>
+<div class="toolbar">
+<button class="btn" id="exportSales">Sales CSV</button>
+<button class="btn" id="exportPurchases">Purchases CSV</button>
+<button class="btn" id="exportInventory2">Inventory CSV</button>
+<button class="btn" id="exportLabor">Labor CSV</button>
+<button class="btn" id="exportExpenses">Expenses CSV</button>
+<button class="btn" id="exportAll">All datasets JSON</button>
+</div>
+</div>
+</section>`,
+        copilot: `<section class="view" id="view-copilot">
+<div class="pagehead">
+<div>
+<h3>Ask the Restaurant</h3>
+<p>Evidence-based answers generated only from loaded browser data.</p>
+</div>
+</div>
+<div class="grid two">
+<div class="card">
+<h4>Question</h4>
+<div class="field">
+<label>Ask about sales, profit, menu, inventory, labor, customers or forecast</label>
+<textarea id="copilotQuestion" placeholder="Example: Why is profit down?">
+</textarea>
+</div>
+<div class="toolbar" style="margin-top:9px">
+<button class="btn primary" id="askBtn">Analyze</button>
+<button class="btn small" data-q="Why is profit down?">Profit</button>
+<button class="btn small" data-q="What should I order tomorrow?">Order</button>
+<button class="btn small" data-q="Which menu items are strongest?">Menu</button>
+<button class="btn small" data-q="How is labor performing?">Labor</button>
+</div>
+</div>
+<div class="card">
+<h4>Answer</h4>
+<div id="copilotAnswer">
+<div class="empty">Ask a question.</div>
+</div>
+</div>
+</div>
+<div class="card" style="margin-top:12px">
+<h4>Suggested questions</h4>
+<div class="taggrid" id="suggestedQuestions">
+<span class="tag">Why is food cost high?</span>
+<span class="tag">What is my break-even sales level?</span>
+<span class="tag">What is forecast for next week?</span>
+<span class="tag">Which ingredients need reordering?</span>
+<span class="tag">Where is margin leaking?</span>
+<span class="tag">Should I raise prices?</span>
+<span class="tag">How many guests can I serve?</span>
+<span class="tag">What is my prime cost?</span>
+</div>
+</div>
+</section>`,
+        data: `<section class="view" id="view-data">
+<div class="pagehead">
+<div>
+<h3>Data Hub</h3>
+<p>Import, inspect and manage the local analytical dataset.</p>
+</div>
+<div class="toolbar">
+<button class="btn primary small" id="dataImportBtn">Import files</button>
+<button class="btn danger small" id="clearDataBtn">Clear local data</button>
+</div>
+</div>
+<div class="grid two">
+<div class="card">
+<h4>Universal POS / CSV importer</h4>
+<div class="drop" id="drop">
+<input id="fileInput" type="file" accept=".csv,.txt,.xlsx,.xls,.json" multiple>
+<strong>Drop almost any POS, sales or restaurant export here</strong>
+<span>Aznur detects the dataset, maps columns, derives safe values, checks duplicates and previews the result before importing.</span>
+<button class="btn primary" id="chooseFiles">Open import wizard</button>
+</div>
+<div id="importQueue" style="margin-top:10px">
+</div>
+<div class="notice" style="margin-top:10px">
+<strong>Works with generic exports:</strong> item-level POS sales, order-level POS exports, payments, purchases, inventory, labor, expenses, guests, reservations, waste, recipes and menu data. Direct POS APIs are a separate connector layer.
+</div>
+</div>
+<div class="card">
+<h4>Dataset health</h4>
+<div id="dataSummary">
+</div>
+</div>
+</div>
+<div class="card" style="margin-top:12px">
+<h4>Loaded datasets</h4>
+<div class="tablewrap">
+<table class="table" id="datasetTable">
+</table>
+</div>
+</div>
+<div class="card">
+<h4>Saved import profiles</h4>
+<div class="formgrid">
+<div class="field">
+<label>Profile name</label>
+<input id="profileName" placeholder="My POS export">
+</div>
+<div class="field">
+<label>Dataset type</label>
+<select id="profileType">
+${KEYS.map(k => `<option value="${k}">${k}</option>`).join("")}
+</select>
+</div>
+<div class="field span2">
+<label>Mapping JSON</label>
+<input id="profileMap" placeholder='{"Total":"net_sales","Qty":"quantity"}'>
+</div>
+</div>
+<div class="toolbar" style="margin-top:8px">
+<button class="btn small" id="saveProfile">Save profile</button>
+<button class="btn small" id="clearProfiles">Clear profiles</button>
+</div>
+<div id="profileList" class="smalltext muted" style="margin-top:8px"></div>
+<div class="hr"></div>
+<h4>Accepted canonical columns</h4>
+<div class="taggrid" id="schemaTags">
+</div>
+<div class="hr">
+</div>
+<div class="toolbar">
+<span class="smalltext muted">Download blank templates.</span>${["sales", "purchases", "inventory", "labor",
+   "expenses", "guests", "reservations", "waste", "recipes",
+      "menu"].map(k => `<button class="btn small tpl" data-type="${k}">${k}.csv</button>`).join("")}</div>
+</div>
+</section>`,
+        settings: `<section class="view" id="view-settings">
+<div class="pagehead">
+<div>
+<h3>Settings</h3>
+<p>Restaurant assumptions, targets and local preferences.</p>
+</div>
+<button class="btn primary small" id="saveSettings">Save settings</button>
+</div>
+<div class="grid two">
+<div class="card">
+<h4>Restaurant profile</h4>
+<div class="formgrid">
+<div class="field span2">
+<label>Restaurant name</label>
+<input id="sName">
+</div>
+<div class="field">
+<label>Currency</label>
+<select id="sCurrency">
+<option>BDT</option>
+<option>USD</option>
+<option>EUR</option>
+<option>INR</option>
+<option>JPY</option>
+<option>GBP</option>
+</select>
+</div>
+<div class="field">
+<label>Seats</label>
+<input id="sSeats" type="number" min="1">
+</div>
+<div class="field">
+<label>Operating hours/day</label>
+<input id="sHours" type="number" min="1" step=".5">
+</div>
+<div class="field">
+<label>Fixed monthly cost</label>
+<input id="sFixed" type="number" min="0">
+</div>
+<div class="field">
+<label>Target food cost %</label>
+<input id="sFood" type="number" min="0" max="100" step=".1">
+</div>
+<div class="field">
+<label>Target labor %</label>
+<input id="sLabor" type="number" min="0" max="100" step=".1">
+</div>
+<div class="field">
+<label>Opening cash</label>
+<input id="sCash" type="number" min="0">
+</div>
+<div class="field">
+<label>Supplier lead days</label>
+<input id="sLead" type="number" min="0" step=".5">
+</div>
+<div class="field">
+<label>Safety stock days</label>
+<input id="sSafety" type="number" min="0" step=".5">
+</div>
+<div class="field">
+<label>Order coverage days</label>
+<input id="sCoverage" type="number" min="1" step=".5">
+</div>
+<div class="field">
+<label>FOH guests / person</label>
+<input id="sFoh" type="number" min="1">
+</div>
+<div class="field">
+<label>BOH guests / person</label>
+<input id="sBoh" type="number" min="1">
+</div>
+<div class="field">
+<label>Manager guests / person</label>
+<input id="sManager" type="number" min="1">
+</div>
+</div>
+</div>
+<div class="card">
+<h4>Data assumptions</h4>
+<div class="notice">Missing costs, guest counts,
+   recipe mappings or labor records reduce confidence and appear in data quality.</div>
+<div class="field" style="margin-top:10px">
+<label>Notes / business assumptions</label>
+<textarea id="sNotes" placeholder="Example: rent is paid monthly; tips are excluded from revenue.">
+</textarea>
+</div>
+<div class="hr">
+</div>
+<div class="smalltext muted">POS APIs, accounting sync, multi-user access,
+   richer event/weather data and server-side ML can be added later without replacing this UI.</div>
+</div>
+</div>
+</section>`
+    };
+    return common[view];
+}
+function mountViews() { $("viewHost").innerHTML = MAIN.concat(PLAN).map(v => viewHtml(v)).join(""); }
+function navButton(v) { return `<button data-view="${v}">${TITLES[v]}</button>`; }
+function buildNav() { $("mainNav").innerHTML = MAIN.map(navButton).join(""); $("planNav").innerHTML = PLAN.map(navButton).join(""); }
+/* ============================================================
+   OPERATIONS + CONTROL
+   ============================================================ */
+function itemUnitPlan() {
+    const next = forecast(1).future[0];
+    const history = dailySales();
+    if (!next || !history.length) return [];
+
+    const days = Math.max(1, Math.min(28, rangeDays()));
+    const recentSales = history.slice(-days)
+        .reduce((a, x) => a + x.sales, 0);
+    const dailyBaseline = recentSales / days || next.sales;
+    const scale = next.sales / Math.max(1, dailyBaseline);
+    const map = new Map();
+
+    salesRows().forEach(x => {
+        const name = String(x.item_name || x.item_id || "Unknown").trim();
+        const row = map.get(name) || { item: name, units: 0 };
+        row.units += x.quantity;
+        map.set(name, row);
+    });
+
+    return [...map.values()]
+        .map(x => ({
+            ...x,
+            dailyUnits: x.units / days,
+            plannedUnits: Math.max(
+                0,
+                Math.round(x.units / days * scale)
+            )
+        }))
+        .sort((a, b) => b.plannedUnits - a.plannedUnits);
+}
+
+function prepPlan() {
+    const plans = itemUnitPlan();
+    if (!plans.length || !app.db.recipes.length) return [];
+
+    const map = new Map();
+    plans.forEach(item => {
+        app.db.recipes.forEach(recipe => {
+            if (String(recipe.menu_item || "").trim().toLowerCase() !==
+                item.item.toLowerCase()) {
+                return;
+            }
+            const ingredient = String(
+                recipe.ingredient || recipe.ingredient_id || "Unknown"
+            ).trim();
+            const key = ingredient.toLowerCase();
+            const row = map.get(key) || {
+                ingredient,
+                quantity: 0,
+                unit: recipe.unit || "",
+                recipeUnits: 0
+            };
+            const yieldPct = num(recipe.yield_pct || 100) / 100 || 1;
+            row.quantity += num(recipe.quantity) * item.plannedUnits / yieldPct;
+            row.recipeUnits += item.plannedUnits;
+            map.set(key, row);
+        });
+    });
+
+    return [...map.values()].sort((a, b) => b.quantity - a.quantity);
+}
+
+function orderPlan() {
+    const lead = num(app.settings.supplierLeadDays) || 2;
+    const safety = num(app.settings.safetyDays) || 1;
+    const coverage = num(app.settings.orderCoverageDays) || 5;
+    return inventoryRows()
+        .filter(x => x.usage > 0 && x.days < lead + safety + coverage)
+        .map(x => {
+            const target = x.usage * (lead + safety + coverage);
+            const orderQty = Math.max(0, target - x.qty);
+            return {
+                ...x,
+                orderQty,
+                estimatedCost: orderQty * x.unitCost
+            };
+        })
+        .filter(x => x.orderQty > 0.0001)
+        .sort((a, b) => b.estimatedCost - a.estimatedCost);
+}
+
+function staffingPlan() {
+    const next = forecast(1).future[0];
+    const guests = next
+        ? Math.round(next.sales / Math.max(1, avgCheck()))
+        : 0;
+    const foh = num(app.settings.staffing?.fohGuestsPerPerson) || 28;
+    const boh = num(app.settings.staffing?.bohGuestsPerPerson) || 24;
+    const manager = num(app.settings.staffing?.managerGuestsPerPerson) || 120;
+    const peak = guests >= 180 ? "High" : guests >= 100 ? "Medium" : "Normal";
+    return {
+        guests,
+        peak,
+        foh: guests ? Math.max(1, Math.ceil(guests / foh)) : 0,
+        boh: guests ? Math.max(1, Math.ceil(guests / boh)) : 0,
+        managers: guests ? Math.max(1, Math.ceil(guests / manager)) : 0
+    };
+}
+
+function closeItems() {
+    return [
+        ["sales", "POS sales imported"],
+        ["payments", "Payments reconciled"],
+        ["labor", "Labor checked"],
+        ["waste", "Waste entered"],
+        ["inventory", "Closing inventory checked"],
+        ["purchases", "Supplier invoices entered"],
+        ["discounts", "Discounts / voids reviewed"]
+    ];
+}
+
+function closeState() {
+    const key = dateKey(new Date());
+    return {
+        key,
+        values: app.settings.dailyCloses?.[key] || {}
+    };
+}
+
+function saveDailyClose() {
+    const state = closeState();
+    app.settings.dailyCloses = app.settings.dailyCloses || {};
+    const values = {};
+    closeItems().forEach(([key]) => {
+        values[key] = !!$("close_" + key)?.checked;
+    });
+    app.settings.dailyCloses[state.key] = values;
+    saveState();
+    renderOperations();
+    toast("Daily close saved");
+}
+
+function supplierWatchRows() {
+    const groups = new Map();
+    purchaseRows().forEach(x => {
+        const key = String(x.ingredient || "Unknown").trim().toLowerCase();
+        const rows = groups.get(key) || [];
+        rows.push(x);
+        groups.set(key, rows);
+    });
+
+    return [...groups.values()].map(rows => {
+        rows.sort((a, b) => a.date.localeCompare(b.date));
+        const recentRows = rows.slice(-3);
+        const priorRows = rows.slice(-6, -3);
+        const average = list => list.length
+            ? list.reduce((a, x) => a + x.unit_cost, 0) / list.length
+            : 0;
+        const recentAvg = average(recentRows);
+        const priorAvg = average(priorRows) || recentAvg;
+        const change = priorAvg
+            ? (recentAvg - priorAvg) / priorAvg * 100
+            : null;
+        const last = rows.at(-1);
+        return {
+            ingredient: last?.ingredient || "Unknown",
+            vendor: last?.vendor || "Unknown",
+            recentAvg,
+            priorAvg,
+            latestCost: last?.unit_cost || 0,
+            change,
+            lastDate: last?.date || ""
+        };
+    }).sort((a, b) => Math.abs(b.change || 0) - Math.abs(a.change || 0));
+}
+
+function weeklyChanges() {
+    const d = dailySales();
+    const n = Math.min(7, Math.floor(d.length / 2));
+    if (!n) return [];
+    const current = d.slice(-n);
+    const prior = d.slice(-2 * n, -n);
+    const sum = rows => rows.reduce((a, x) => a + x.sales, 0);
+    const currentSales = sum(current);
+    const priorSales = sum(prior);
+    const currentGuests = current.reduce((a, x) => a + x.covers, 0);
+    const priorGuests = prior.reduce((a, x) => a + x.covers, 0);
+    const currentCheck = currentGuests ? currentSales / currentGuests : 0;
+    const priorCheck = priorGuests ? priorSales / priorGuests : 0;
+    const datesCurrent = new Set(current.map(x => x.date));
+    const datesPrior = new Set(prior.map(x => x.date));
+    const cogsCurrent = theoreticalCOGSForDates(datesCurrent);
+    const cogsPrior = theoreticalCOGSForDates(datesPrior);
+    const laborCurrent = laborRows()
+        .filter(x => datesCurrent.has(x.date))
+        .reduce((a, x) => a + x.labor_cost, 0);
+    const laborPrior = laborRows()
+        .filter(x => datesPrior.has(x.date))
+        .reduce((a, x) => a + x.labor_cost, 0);
+    const wasteCurrent = wasteRows()
+        .filter(x => datesCurrent.has(x.date))
+        .reduce((a, x) => a + x.cost, 0);
+    const wastePrior = wasteRows()
+        .filter(x => datesPrior.has(x.date))
+        .reduce((a, x) => a + x.cost, 0);
+    const delta = (a, b) => b ? (a - b) / Math.abs(b) * 100 : null;
+    const points = (a, b) => a == null || b == null ? null : a - b;
+
+    return [
+        ["Revenue", currentSales, priorSales, delta(currentSales, priorSales)],
+        ["Guests", currentGuests, priorGuests, delta(currentGuests, priorGuests)],
+        ["Average check", currentCheck, priorCheck, delta(currentCheck, priorCheck)],
+        ["Food cost %", currentSales ? cogsCurrent / currentSales * 100 : 0,
+            priorSales ? cogsPrior / priorSales * 100 : 0,
+            points(
+                currentSales ? cogsCurrent / currentSales * 100 : 0,
+                priorSales ? cogsPrior / priorSales * 100 : 0
+            )],
+        ["Labor %", currentSales ? laborCurrent / currentSales * 100 : 0,
+            priorSales ? laborPrior / priorSales * 100 : 0,
+            points(
+                currentSales ? laborCurrent / currentSales * 100 : 0,
+                priorSales ? laborPrior / priorSales * 100 : 0
+            )],
+        ["Waste", wasteCurrent, wastePrior, delta(wasteCurrent, wastePrior)]
+    ];
+}
+
+function theoreticalCOGSForDates(dates) {
+    return salesRows()
+        .filter(x => dates.has(x.date))
+        .reduce((sum, x) => sum + recipeCost(x.item_name) * x.quantity, 0);
+}
+
+function controlScore() {
+    const c = cogsReconciliation();
+    const q = quality();
+    const r = revenue();
+    const foodPct = r ? c.theoretical / r * 100 : 0;
+    const laborPct = r ? labor() / r * 100 : 0;
+    const variancePct = c.theoretical
+        ? Math.abs(c.variance) / c.theoretical * 100
+        : 0;
+    const supplierAlerts = supplierWatchRows()
+        .filter(x => x.change != null && x.change > 5).length;
+
+    let profitability = 100;
+    if (r <= 0) profitability -= 35;
+    if (foodPct > app.settings.foodTarget) profitability -= 20;
+    if (laborPct > app.settings.laborTarget) profitability -= 15;
+
+    let food = 100 - Math.min(45, variancePct * 3);
+    if (!app.db.recipes.length) food -= 20;
+
+    return {
+        overall: Math.round(
+            Math.max(0, profitability) * .35 +
+            Math.max(0, food) * .25 +
+            Math.max(0, 100 - supplierAlerts * 12) * .15 +
+            q.score * .25
+        ),
+        profitability: Math.max(0, Math.round(profitability)),
+        food: Math.max(0, Math.round(food)),
+        supplier: Math.max(0, 100 - supplierAlerts * 12),
+        data: q.score
+    };
+}
+
+function renderProfiles() {
+    const profiles = Array.isArray(app.settings.importProfiles)
+        ? app.settings.importProfiles
+        : [];
+    const list = $("profileList");
+    if (!list) return;
+    list.innerHTML = profiles.length
+        ? profiles.map(x => `<span class="tag">
+${esc(x.name)} · ${esc(x.type)}
+</span>`).join(" ")
+        : "No saved profiles yet.";
+
+    const saveProfileButton = $("saveProfile");
+    if (saveProfileButton) saveProfileButton.onclick = () => {
+        const name = $("profileName").value.trim();
+        if (!name) return toast("Enter a profile name");
+        let mapping = {};
+        try {
+            mapping = JSON.parse($("profileMap").value || "{}");
+        } catch {
+            return toast("Mapping must be valid JSON");
+        }
+        app.settings.importProfiles = profiles.concat({
+            name,
+            type: $("profileType").value,
+            mapping
+        });
+        saveState();
+        renderProfiles();
+        toast("Import profile saved");
+    };
+
+    const clearProfilesButton = $("clearProfiles");
+    if (clearProfilesButton) clearProfilesButton.onclick = () => {
+        app.settings.importProfiles = [];
+        saveState();
+        renderProfiles();
+        toast("Import profiles cleared");
+    };
+}
+
+/* ============================================================
+   RENDERERS
+   ============================================================ */
+function renderOperations() {
+    const next = forecast(1).future[0];
+    const orders = orderPlan();
+    const prep = prepPlan();
+    const staff = staffingPlan();
+    const c = cogsReconciliation();
+    const close = closeState();
+    const closeList = closeItems();
+    const done = closeList.filter(([key]) => close.values[key]).length;
+
+    $("opsDateLabel").textContent = next?.date || dateKey(new Date());
+    $("opsKpis").innerHTML = [
+        ["Forecast sales", money(next?.sales || 0)],
+        ["Forecast guests", staff.guests.toLocaleString()],
+        ["Prep lines", prep.length.toLocaleString()],
+        ["Order value", money(orders.reduce((a, x) => a + x.estimatedCost, 0))],
+        ["Daily close", `${done}/${closeList.length}`]
+    ].map(x => `<div class="action-tile">
+<div class="label">${esc(x[0])}</div>
+<strong>${x[1]}</strong>
+</div>`).join("");
+
+    const alerts = [];
+    const r = revenue();
+    const fp = r ? c.theoretical / r * 100 : 0;
+    const lp = r ? labor() / r * 100 : 0;
+    if (fp > app.settings.foodTarget) {
+        alerts.push({
+            level: "bad",
+            text: `Food cost is ${percent(fp)} against a ${percent(app.settings.foodTarget)} target.`
+        });
+    }
+    if (lp > app.settings.laborTarget) {
+        alerts.push({
+            level: "bad",
+            text: `Labor is ${percent(lp)} against a ${percent(app.settings.laborTarget)} target.`
+        });
+    }
+    if (orders.length) {
+        alerts.push({
+            level: "bad",
+            text: `${orders.length} ingredients need additional stock coverage.`
+        });
+    }
+    if (c.variance > 0) {
+        alerts.push({
+            level: "bad",
+            text: `COGS is ${money(c.variance)} above theoretical usage.`
+        });
+    }
+    if (!alerts.length) {
+        alerts.push({ level: "good", text: "No major operating flags detected." });
+    }
+
+    $("opsActions").innerHTML = `<div class="alert-list">
+${alerts.map(x => `<div class="alert-item ${x.level}">${esc(x.text)}</div>`).join("")}
+</div>`;
+
+    $("morningBrief").innerHTML = `<div class="metric-list">
+<div class="metric-row"><span>Tomorrow</span><strong>${next?.date || "—"}</strong></div>
+<div class="metric-row"><span>Expected sales</span><strong>${money(next?.sales || 0)}</strong></div>
+<div class="metric-row"><span>Planning range</span><strong>${money(next?.lo || 0)} – ${money(next?.hi || 0)}</strong></div>
+<div class="metric-row"><span>Expected guests</span><strong>${staff.guests.toLocaleString()}</strong></div>
+<div class="metric-row"><span>Demand level</span><strong>${staff.peak}</strong></div>
+<div class="metric-row"><span>Method</span><strong>${esc(forecast(1).method)}</strong></div>
+</div>
+<div class="notice" style="margin-top:9px">
+Use this page as the morning hand-off. Validate the floor plan against the actual booking and event picture before opening.
+</div>`;
+
+    $("prepTable").innerHTML = prep.length
+        ? `<thead><tr><th>Ingredient</th><th>Planned qty</th><th>Unit</th><th>Recipe units</th></tr></thead>
+<tbody>${prep.slice(0, 100).map(x => `<tr>
+<td>${esc(x.ingredient)}</td>
+<td>${x.quantity.toFixed(2)}</td>
+<td>${esc(x.unit)}</td>
+<td>${x.recipeUnits.toLocaleString()}</td>
+</tr>`).join("")}</tbody>`
+        : `<tbody><tr><td class="empty">Add recipe lines and sales history to generate prep.</td></tr></tbody>`;
+
+    $("orderTable").innerHTML = orders.length
+        ? `<thead><tr><th>Ingredient</th><th>Stock</th><th>Days</th><th>Order qty</th><th>Est. cost</th></tr></thead>
+<tbody>${orders.slice(0, 100).map(x => `<tr>
+<td>${esc(x.ingredient)}</td>
+<td>${x.qty.toFixed(2)} ${esc(x.unit)}</td>
+<td>${x.days.toFixed(1)}</td>
+<td>${x.orderQty.toFixed(2)}</td>
+<td>${money(x.estimatedCost)}</td>
+</tr>`).join("")}</tbody>`
+        : `<tbody><tr><td class="empty">No forecast-driven order is required.</td></tr></tbody>`;
+
+    $("staffPlan").innerHTML = `<div class="grid three">
+${metric("FOH", staff.foh || "—", "Guests / FOH target")}
+${metric("BOH", staff.boh || "—", "Guests / BOH target")}
+${metric("Managers", staff.managers || "—", "Coverage target")}
+</div>
+<div class="hr"></div>
+<div class="smalltext muted">
+Configurable productivity assumptions replace the universal 10-guests-per-person heuristic. Confirm role mix, breaks and peak hours locally.
+</div>`;
+
+    $("dailyClose").innerHTML = `<div class="smalltext muted" style="margin-bottom:7px">
+Close checklist for ${close.key}.
+</div>
+<div class="checklist">
+${closeList.map(([key, label]) => `<label class="check-row">
+<input type="checkbox" id="close_${key}" ${close.values[key] ? "checked" : ""}>
+<span>${esc(label)}</span>
+</label>`).join("")}
+</div>
+<div class="toolbar" style="margin-top:9px">
+<button class="btn primary small" id="saveClose">Save daily close</button>
+</div>`;
+
+    $("exportPrep").onclick = () => download(
+        "aznur_morning_prep.csv",
+        csv(prep),
+        "text/csv"
+    );
+    $("exportOrder").onclick = () => download(
+        "aznur_purchasing_list.csv",
+        csv(orders),
+        "text/csv"
+    );
+    $("saveClose").onclick = saveDailyClose;
+    $("printOps").onclick = () => window.print();
+}
+
+function renderControl() {
+    const c = cogsReconciliation();
+    const score = controlScore();
+    const suppliers = supplierWatchRows();
+    const changes = weeklyChanges();
+    const r = revenue();
+    const foodPct = r ? c.theoretical / r * 100 : 0;
+    const laborPct = r ? labor() / r * 100 : 0;
+
+    $("controlKpis").innerHTML = [
+        metric("Theoretical COGS", money(c.theoretical), "Recipe usage"),
+        metric("Actual COGS", money(c.actual), "Inventory + purchases"),
+        metric("Variance", money(c.variance),
+            c.theoretical ? percent(c.variance / c.theoretical * 100) : "Need recipe cost",
+            c.variance > 0 ? "trend-bad" : "trend-good"),
+        metric("Control score", `${score.overall}/100`,
+            `Data quality ${score.data}/100`,
+            score.overall < 70 ? "trend-warn" : "trend-good")
+    ].join("");
+
+    $("cogsSummary").innerHTML = `<div class="metric-list">
+<div class="metric-row"><span>Period</span><strong>${c.start || "—"} → ${c.end || "—"}</strong></div>
+<div class="metric-row"><span>Opening inventory</span><strong>${money(c.opening)}</strong></div>
+<div class="metric-row"><span>Purchases</span><strong>${money(c.purchases)}</strong></div>
+<div class="metric-row"><span>Closing inventory</span><strong>${money(c.closing)}</strong></div>
+<div class="metric-row"><span>Theoretical food cost %</span><strong>${percent(foodPct)}</strong></div>
+<div class="metric-row"><span>Labor %</span><strong>${percent(laborPct)}</strong></div>
+</div>`;
+
+    $("cogsTable").innerHTML = c.rows.length
+        ? `<thead><tr><th>Ingredient</th><th>Opening</th><th>Purchases</th><th>Closing</th><th>Theoretical</th><th>Actual</th><th>Variance</th></tr></thead>
+<tbody>${c.rows.slice(0, 100).map(x => `<tr>
+<td>${esc(x.ingredient)}</td>
+<td>${money(x.opening)}</td>
+<td>${money(x.purchases)}</td>
+<td>${money(x.closing)}</td>
+<td>${money(x.theoretical)}</td>
+<td>${money(x.actual)}</td>
+<td class="${x.variance > 0 ? "trend-bad" : "trend-good"}">${money(x.variance)}</td>
+</tr>`).join("")}</tbody>`
+        : `<tbody><tr><td class="empty">No ingredient-level COGS records yet.</td></tr></tbody>`;
+
+    $("supplierWatch").innerHTML = suppliers.length
+        ? `<div class="alert-list">${suppliers.slice(0, 10).map(x => {
+            const increase = x.change != null && x.change > 5;
+            const change = x.change == null
+                ? "—"
+                : `${x.change >= 0 ? "+" : ""}${x.change.toFixed(1)}%`;
+            return `<div class="alert-item ${increase ? "bad" : "good"}">
+<strong>${esc(x.ingredient)}</strong> · ${esc(x.vendor)}<br>
+Last ${money(x.latestCost)} / unit · recent avg ${money(x.recentAvg)}<br>
+Price change: <strong>${change}</strong>${increase ? " · review supplier quote" : ""}
+</div>`;
+        }).join("")}</div>`
+        : `<div class="empty">Import purchases to activate supplier price watch.</div>`;
+
+    $("changeTable").innerHTML = changes.length
+        ? `<div class="tablewrap"><table class="table compact">
+<thead><tr><th>Metric</th><th>Current</th><th>Prior</th><th>Change</th></tr></thead>
+<tbody>${changes.map(x => {
+            const ratio = x[0].endsWith("%") || x[0] === "Average check";
+            const current = ratio ?
+                (x[0] === "Average check" ? money(x[1]) : percent(x[1])) : money(x[1]);
+            const prior = ratio ?
+                (x[0] === "Average check" ? money(x[2]) : percent(x[2])) : money(x[2]);
+            const bad = (x[0] === "Food cost %" || x[0] === "Labor %")
+                ? x[3] > 0
+                : x[0] === "Waste" ? x[3] > 0 : false;
+            const change = x[3] == null ? "—" :
+                `${x[3] >= 0 ? "+" : ""}${x[3].toFixed(1)}${x[0].endsWith("%") ? " pts" : "%"}`;
+            return `<tr>
+<td>${esc(x[0])}</td>
+<td>${current}</td>
+<td>${prior}</td>
+<td class="${bad ? "trend-bad" : "trend-good"}">${change}</td>
+</tr>`;
+        }).join("")}</tbody>
+</table></div>`
+        : `<div class="empty">Need at least two comparable periods.</div>`;
+
+    $("controlScore").innerHTML = `<div class="score-ring">
+<strong>${score.overall}</strong>
+</div>
+<div class="smalltext muted" style="text-align:center;margin:7px 0 13px">Owner control score</div>
+<div class="metric-list">
+<div class="metric-row"><span>Profitability</span><strong>${score.profitability}</strong></div>
+<div class="metric-row"><span>Food control</span><strong>${score.food}</strong></div>
+<div class="metric-row"><span>Supplier control</span><strong>${score.supplier}</strong></div>
+<div class="metric-row"><span>Data reliability</span><strong>${score.data}</strong></div>
+</div>
+<div class="notice" style="margin-top:9px">
+A management heuristic for prioritization, not a replacement for accounting statements.
+</div>`;
+
+    $("exportVariance").onclick = () => download(
+        "aznur_cogs_variance.csv",
+        csv(c.rows),
+        "text/csv"
+    );
+    $("refreshControl").onclick = () => {
+        invalidate();
+        renderControl();
+        toast("Margin control recalculated");
+    };
+}
+
+function renderDashboard() {
+    const d = recent(30), r = d.reduce((a, x) => a + x.sales, 0), prior = d.length ? dailySales().slice(-60, -30).reduce((a, x) => a + x.sales, 0) : 0, c = d.reduce((a, x) => a + x.covers, 0) || covers(), avg = c ? r / c : 0, t = theoreticalCOGS(), l = labor(), fp = r ? t / r * 100 : 0, lp = r ? l / r * 100 : 0, op = r - t - l - opex();
+    $("dashboardKpis").innerHTML = [metric("Net sales", money(r), prior ? `${r >= prior ? "↑" : "↓"} ${Math.abs((r - prior) / prior * 100).toFixed(1)}% vs prior` : ""), metric("Guests / covers", c.toLocaleString(), c ? "Recent sales period" : "Add guest counts"), metric("Average check", money(avg), c ? "Revenue / guest" : "Guest counts required"), metric("Food cost", percent(fp), `Target ${percent(app.settings.foodTarget)}`, fp > app.settings.foodTarget ? "trend-bad" : "trend-good"), metric("Labor cost", percent(lp), `Target ${percent(app.settings.laborTarget)}`, lp > app.settings.laborTarget ? "trend-warn" : "trend-good"), metric("Operating profit", money(op), "Sales − COGS − labor − Opex", op < 0 ? "trend-bad" : "trend-good")].join("");
+    const f = forecast(7), h = f.hist.slice(-30), labels = [...h.map(x => x.date), ...f.future.map(x => x.date)], actual = [...h.map(x => x.sales), ...Array(f.future.length).fill(null)], pred = [...Array(Math.max(0, h.length - 1)).fill(null), h.at(-1)?.sales || null, ...f.future.map(x => x.sales)];
+    chart("salesChart", "line", { labels, datasets: [{ label: "Actual", data: actual, borderColor: COLORS.accent2, borderWidth: 1.6, pointRadius: 0, tension: .2 }, { label: "Forecast", data: pred, borderColor: COLORS.dim, borderWidth: 1.3, borderDash: [5, 4], pointRadius: 0, tension: .2 }] }, { legend: true });
+    let health = 0;
+    health += r > 0 ? 25 : 0;
+    health += fp && fp <= app.settings.foodTarget ? 20 : fp ? 8 : 0;
+    health += lp && lp <= app.settings.laborTarget ? 20 : lp ? 8 : 0;
+    health += op >= 0 ? 20 : 0;
+    health += app.db.inventory.length ? 15 : 5;
+    $("healthPanel").innerHTML = `<div class="stat">
+<div class="k">Composite health</div>
+<div class="v">${health}/100</div>
+<div class="d">Rule-based operating score</div>
+</div>
+<div class="progress" style="margin:9px 0 11px">
+<i style="width:${health}%">
+</i>
+</div>
+<div class="metric-list">
+<div class="metric-row">
+<span>Margin pressure</span>
+<strong>${fp > app.settings.foodTarget ? "High" : "Controlled"}</strong>
+</div>
+<div class="metric-row">
+<span>Forecast confidence</span>
+<strong>${f.wape == null ? "Low data" : f.wape < 15 ? "Strong" : f.wape < 25 ? "Medium" : "Weak"}</strong>
+</div>
+<div class="metric-row">
+<span>Inventory visibility</span>
+<strong>${app.db.inventory.length ? "Loaded" : "Missing"}</strong>
+</div>
+<div class="metric-row">
+<span>Labor visibility</span>
+<strong>${l ? "Loaded" : "Missing"}</strong>
+</div>
+</div>`;
+    const items = menuAnalysis().slice(0, 6);
+    $("topItems").innerHTML = items.length ? `<div class="metric-list">${items.map(x => `<div class="metric-row">
+<span>${esc(x.name)}<br>
+<small class="muted">${x.class} • ${x.qty.toLocaleString()} units</small>
+</span>
+<strong>${money(x.cm)}</strong>
+</div>`).join("")}</div>` : `<div class="empty">Import sales to rank menu items.</div>`;
+    const acts = actions();
+    $("actionQueue").innerHTML = acts.length ? `<ul class="list-clean">${acts.slice(0, 6).map(x => `<li>
+<span class="badge ${x.level}">${x.level.toUpperCase()}</span> ${esc(x.text)}</li>`).join("")}</ul>` : `<div class="successbox">No major signals detected.</div>`;
+    const nxt = f.future[0], g = nxt && avg ? Math.round(nxt.sales / avg) : 0;
+    $("tomorrowPanel").innerHTML = nxt ? `<div class="metric-list">
+<div class="metric-row">
+<span>Expected sales</span>
+<strong>${money(nxt.sales)}</strong>
+</div>
+<div class="metric-row">
+<span>Likely range</span>
+<strong>${money(nxt.lo)} – ${money(nxt.hi)}</strong>
+</div>
+<div class="metric-row">
+<span>Expected guests</span>
+<strong>${g.toLocaleString()}</strong>
+</div>
+<div class="metric-row">
+<span>Method</span>
+<strong>${esc(f.method)}</strong>
+</div>
+</div>` : `<div class="empty">Load sales history for a forecast.</div>`;
+    const daypart = { Breakfast: 0, Lunch: 0, Dinner: 0, Late: 0 };
+    const ch = {};
+    salesRows().forEach(x => { const h = Number.parseInt(String(x.time || ""), 10); const k = !Number.isFinite(h) || h >= 16 && h < 22 ? "Dinner" : h < 11 ? "Breakfast" : h < 16 ? "Lunch" : "Late"; daypart[k] += x.net_sales; const c = x.channel || x.order_type || "Unknown"; ch[c] = (ch[c] || 0) + x.net_sales; });
+    chart("daypartChart", "doughnut", { labels: Object.keys(daypart), datasets: [{ data: Object.values(daypart), backgroundColor: ["#fbbf24", "#f59e0b", "#d97706", "#78716c"], borderWidth: 0 }] }, { legend: true });
+    const topCh = Object.entries(ch).slice(0, 8);
+    chart("channelChart", "doughnut", { labels: topCh.map(x => x[0]), datasets: [{ data: topCh.map(x => x[1]), backgroundColor: ["#f59e0b", "#d97706", "#fbbf24", "#b45309", "#78716c", "#a8a29e", "#57534e", "#d6d3d1"], borderWidth: 0 }] }, { legend: true });
+}
+function renderForecast() { const h = +$('forecastHorizon').value || 28, f = forecast(h), projected = f.future.reduce((a, x) => a + x.sales, 0), four = f.future.slice(0, 28).reduce((a, x) => a + x.sales, 0); $("forecastKpis").innerHTML = [metric("Next day", money(f.future[0]?.sales || 0), f.future[0] ? `${money(f.future[0].lo)} – ${money(f.future[0].hi)}` : "No data"), metric(`${h}-day sales`, money(projected), f.method), metric("Forecast WAPE", f.wape == null ? "—" : percent(f.wape), f.wape == null ? "Need more history" : f.wape < 15 ? "Strong" : f.wape < 25 ? "Medium" : "Weak", f.wape != null && f.wape >= 25 ? "trend-warn" : "trend-good"), metric("4-week run-rate", money(four), "Planning estimate")].join(""); const hist = f.hist.slice(-60), labels = [...hist.map(x => x.date), ...f.future.map(x => x.date)], act = [...hist.map(x => x.sales), ...Array(f.future.length).fill(null)], p50 = [...Array(Math.max(0, hist.length - 1)).fill(null), hist.at(-1)?.sales || null, ...f.future.map(x => x.sales)], up = [...Array(hist.length).fill(null), ...f.future.map(x => x.hi)], lo = [...Array(hist.length).fill(null), ...f.future.map(x => x.lo)]; chart("forecastChart", "line", { labels, datasets: [{ label: "Actual", data: act, borderColor: COLORS.accent2, borderWidth: 1.6, pointRadius: 0, tension: .2 }, { label: "Forecast P50", data: p50, borderColor: COLORS.dim, borderWidth: 1.3, borderDash: [5, 4], pointRadius: 0, tension: .2 }, { label: "Upper", data: up, borderColor: "#d6d3d1", borderWidth: 1, pointRadius: 0 }, { label: "Lower", data: lo, borderColor: "#d6d3d1", borderWidth: 1, pointRadius: 0 }] }, { legend: true }); $("forecastDiagnostics").innerHTML = `<div class="metric-list">
+<div class="metric-row">
+<span>History</span>
+<strong>${f.hist.length} days</strong>
+</div>
+<div class="metric-row">
+<span>Method</span>
+<strong>${esc(f.method)}</strong>
+</div>
+<div class="metric-row">
+<span>Backtest MAE</span>
+<strong>${f.mae == null ? "—" : money(f.mae)}</strong>
+</div>
+<div class="metric-row">
+<span>Backtest WAPE</span>
+<strong>${f.wape == null ? "—" : percent(f.wape)}</strong>
+</div>
+<div class="metric-row">
+<span>Bias</span>
+<strong>${f.bias >= 0 ? "+" : ""}${money(f.bias)}</strong>
+</div>
+</div>
+<div class="hr">
+</div>
+<div class="smalltext muted">The model blends recent level,
+   short trend and repeated weekly seasonality when enough history exists.</div>`; const by = {}; f.future.forEach(x => { const d = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][x.dow]; by[d] ??= []; by[d].push(x.sales); }); $("weekdayForecast").innerHTML = `<div class="metric-list">${Object.entries(by).map(([d, v]) => `<div class="metric-row">
+<span>${d}</span>
+<strong>${money(v.reduce((a, b) => a + b, 0) / v.length)}</strong>
+</div>`).join("")}</div>`; $("forecastSignals").innerHTML = actions().length ? `<ul class="list-clean">${actions().map(x => `<li>${esc(x.text)}</li>`).join("")}</ul>` : `<div class="successbox">No strong planning signal detected.</div>`; }
+function monthlyPnl() { return cache("pnl", () => { const m = new Map(), add = (d, k,
+   v) => { const x = m.get(d) || { month: d, sales: 0, cogs: 0, labor: 0, opex: 0 }; x[k] += v; m.set(d, x); };
+      salesRows().forEach(r => { add(r.date.slice(0, 7), "sales", r.net_sales); add(r.date.slice(0, 7), "cogs",
+         recipeCost(r.item_name) * r.quantity); }); laborRows().forEach(r => add(r.date.slice(0, 7), "labor",
+            r.labor_cost)); expenseRows().forEach(r => add(r.date.slice(0, 7), "opex", r.amount));
+               return [...m.values()].sort((a, b) => a.month.localeCompare(b.month)).map(x => ({ ...x,
+                  op: x.sales - x.cogs - x.labor - x.opex })); }); }
+function renderFinance() { const r = revenue(), c = theoreticalCOGS() || actualCOGS(), l = labor(), o = opex(),
+   gross = r - c, prime = c + l, op = r - prime - o, b = breakEven();
+      $("financeKpis").innerHTML = [metric("Revenue", money(r),
+         `${rangeDays()} days`), metric("Gross profit", money(gross), r ? `Margin ${percent(gross / r * 100)}` : ""), metric("Prime cost", money(prime), r ? `${percent(prime / r * 100)} of sales` : "", r && prime / r > .5 ? "trend-warn" : ""), metric("Operating profit", money(op), r ? `Margin ${percent(op / r * 100)}` : "", op < 0 ? "trend-bad" : "trend-good")].join(""); const rows = monthlyPnl(); $("pnlTable").innerHTML = `<thead>
+<tr>
+<th>Month</th>
+<th>Sales</th>
+<th>COGS</th>
+<th>Labor</th>
+<th>Opex</th>
+<th>Operating profit</th>
+<th>Margin</th>
+</tr>
+</thead>
+<tbody>${rows.map(x => `<tr>
+<td>${x.month}</td>
+<td>${money(x.sales)}</td>
+<td>${money(x.cogs)}</td>
+<td>${money(x.labor)}</td>
+<td>${money(x.opex)}</td>
+<td>${money(x.op)}</td>
+<td>${percent(x.sales ? x.op / x.sales * 100 : 0)}</td>
+</tr>`).join("")}</tbody>`; chart("costChart", "bar", { labels: ["COGS", "Labor", "Opex", "Operating profit"],
+   datasets: [{ label: "Amount", data: [c, l, o, op], backgroundColor: ["#fbbf24", "#f59e0b", "#78716c",
+      op >= 0 ? "#10b981" : "#ef4444"], borderWidth: 0 }] }, { legend: false });
+         $("breakEven").innerHTML = `<div class="metric-list">
+<div class="metric-row">
+<span>Contribution margin ratio</span>
+<strong>${percent(b.cmr * 100)}</strong>
+</div>
+<div class="metric-row">
+<span>Break-even sales</span>
+<strong>${money(b.breakEvenSales)}</strong>
+</div>
+<div class="metric-row">
+<span>Break-even guests</span>
+<strong>${Math.ceil(b.breakEvenGuests).toLocaleString()}</strong>
+</div>
+<div class="metric-row">
+<span>Margin of safety</span>
+<strong>${money(r - b.breakEvenSales)}</strong>
+</div>
+</div>`; $("cashPanel").innerHTML = `<div class="metric-list">
+<div class="metric-row">
+<span>Opening cash</span>
+<strong>${money(app.settings.openingCash)}</strong>
+</div>
+<div class="metric-row">
+<span>Operating profit</span>
+<strong>${money(op)}</strong>
+</div>
+<div class="metric-row">
+<span>Simple ending cash</span>
+<strong>${money(app.settings.openingCash + op)}</strong>
+</div>
+</div>
+<div class="footer-note">A true cash forecast also needs payment timing, payables, receivables,
+   debt and capex.</div>`; $("capexPanel").innerHTML = `<div class="metric-list">
+<div class="metric-row">
+<span>Capex planning</span>
+<strong>Ready</strong>
+</div>
+<div class="metric-row">
+<span>Suggested rule</span>
+<strong>Fund after break-even</strong>
+</div>
+</div>
+<button class="btn small" id="capexBtn" style="margin-top:9px">Open capex calculator</button>`; $("capexBtn").onclick = openCapex; }
+function renderMenu() { const a = menuAnalysis(); $("menuTable").innerHTML = `<thead>
+<tr>
+<th>Item</th>
+<th>Category</th>
+<th>Units</th>
+<th>Revenue</th>
+<th>Unit cost</th>
+<th>Food %</th>
+<th>CM/unit</th>
+<th>Class</th>
+</tr>
+</thead>
+<tbody>${a.map(x => `<tr>
+<td>${esc(x.name)}</td>
+<td>${esc(x.category)}</td>
+<td>${x.qty.toLocaleString()}</td>
+<td>${money(x.revenue)}</td>
+<td>${money(x.cost)}</td>
+<td>${percent(x.foodPct)}</td>
+<td>${money(x.cmPerUnit)}</td>
+<td>
+<span class="badge ${x.class === "Star" ? "good" : x.class === "Dog" ? "bad" : x.class === "Workhorse" ? "warn" : "info"}">${x.class}</span>
+</td>
+</tr>`).join("")}</tbody>`; const cat = new Map(); a.forEach(x => { const y = cat.get(x.category) || { r: 0,
+   c: 0 }; y.r += x.revenue; y.c += x.cm; cat.set(x.category, y); }); chart("categoryChart", "bar",
+      { labels: [...cat.keys()], datasets: [{ label: "Revenue", data: [...cat.values()].map(x => x.r),
+         backgroundColor: "#fbbf24", borderWidth: 0 }, { label: "Contribution",
+            data: [...cat.values()].map(x => x.c), backgroundColor: "#d97706", borderWidth: 0 }] },
+               { legend: true }); const first = a[0];
+                  $("recipeSimulator").innerHTML = first ? `<div class="formgrid">
+<div class="field">
+<label>Menu item</label>
+<select id="simItem">${a.map(x => `<option>${esc(x.name)}</option>`).join("")}</select>
+</div>
+<div class="field">
+<label>Current price</label>
+<input id="simPrice" type="number" value="${first.price.toFixed(2)}">
+</div>
+<div class="field">
+<label>Demand change %</label>
+<input id="simDemand" type="number" value="0">
+</div>
+<div class="field">
+<label>New price</label>
+<input id="simNewPrice" type="number" value="${first.price.toFixed(2)}">
+</div>
+</div>
+<div class="toolbar" style="margin-top:9px">
+<button class="btn primary small" id="runMenuSim">Simulate</button>
+</div>
+<div id="menuSimResult" style="margin-top:9px">
+</div>` : `<div class="empty">Import sales and optional menu/recipe costs.</div>`; if (first) {
+    $("simItem").onchange = () => { const x = menuAnalysis().find(x => x.name === $("simItem").value); $("simPrice").value = x?.price.toFixed(2) || 0; $("simNewPrice").value = x?.price.toFixed(2) || 0; };
+    $("runMenuSim").onclick = () => { const x = menuAnalysis().find(x => x.name === $("simItem").value); if (!x)
+        return; const d = num($("simDemand").value) / 100, np = num($("simNewPrice").value), units = x.qty * (1 + d), rr = units * np, c = units * x.cost; $("menuSimResult").innerHTML = `<div class="successbox">Projected sales ${money(rr)}, food cost ${money(c)}, contribution ${money(rr - c)}. Units required to keep today's revenue: <strong>${np ? Math.ceil(x.revenue / np).toLocaleString() : "—"}</strong>.</div>`; };
+} }
+function renderInventory() { const a = inventoryRows(), value = a.reduce((s, x) => s + x.value, 0),
+   reorder = a.filter(x => x.status !== "OK").length, low = a.filter(x => x.days < 3).length,
+      near = a.filter(x => x.expiry && parseDate(x.expiry) && ((parseDate(x.expiry) - new Date()) / 86400000 < 3)).length; $("inventoryKpis").innerHTML = [metric("Inventory value", money(value), "Current snapshots"), metric("Items to reorder", reorder, "Forecast-driven", reorder ? "trend-warn" : "trend-good"), metric("Low / critical", low, "Below 3 days", low ? "trend-warn" : ""), metric("Near expiry", near, "Within 3 days", near ? "trend-bad" : "trend-good")].join(""); $("inventoryTable").innerHTML = `<thead>
+<tr>
+<th>Ingredient</th>
+<th>Stock</th>
+<th>Unit cost</th>
+<th>Value</th>
+<th>Usage/day</th>
+<th>Days</th>
+<th>Status</th>
+<th>Expiry</th>
+</tr>
+</thead>
+<tbody>${a.slice(0, 150).map(x => `<tr>
+<td>${esc(x.ingredient)}</td>
+<td>${x.qty} ${esc(x.unit)}</td>
+<td>${money(x.unitCost)}</td>
+<td>${money(x.value)}</td>
+<td>${x.usage.toFixed(2)}</td>
+<td>${x.days > 100 ? "—" : x.days.toFixed(1)}</td>
+<td>
+<span class="badge ${x.status === "ORDER NOW" ? "bad" : x.status === "ORDER SOON" ? "warn" : "good"}">${x.status}</span>
+</td>
+<td>${esc(x.expiry || "—")}</td>
+</tr>`).join("")}</tbody>`; }
+function renderPurchasing() { const p = purchaseRows(), sp = p.reduce((a, x) => a + x.total, 0), v = new Map();
+   p.forEach(x => v.set(x.vendor, (v.get(x.vendor) || 0) + x.total)); const top = [...v.entries()].sort((a,
+      b) => b[1] - a[1]).slice(0, 10); $("purchasingKpis").innerHTML = [metric("Purchases", money(sp),
+         `${p.length.toLocaleString()} lines`), metric("Suppliers", v.size, "Distinct vendors"), metric("Average line", money(p.length ? sp / p.length : 0), "Spend / line")].join(""); chart("vendorChart", "bar", { labels: top.map(x => x[0] || "Unknown"), datasets: [{ label: "Spend", data: top.map(x => x[1]), backgroundColor: "#f59e0b", borderWidth: 0 }] }, { legend: false, indexAxis: "y" }); const by = new Map(); p.forEach(x => { const k = x.ingredient || "Unknown", z = by.get(k) || { sum: 0, n: 0, min: Infinity, max: 0 }; z.sum += x.unit_cost; z.n++; z.min = Math.min(z.min, x.unit_cost); z.max = Math.max(z.max, x.unit_cost); by.set(k, z); }); const sig = [...by.entries()].sort((a, b) => (b[1].max - b[1].min) - (a[1].max - a[1].min)).slice(0, 8); $("supplierSignals").innerHTML = sig.length ? `<ul class="list-clean">${sig.map(([k, x]) => `<li>
+<strong>${esc(k)}</strong> — avg ${money(x.sum / x.n)},
+   range ${money(x.min)}–${money(x.max)}</li>`).join("")}</ul>` : `<div class="empty">No purchase records loaded.</div>`; $("purchaseTable").innerHTML = `<thead>
+<tr>
+<th>Date</th>
+<th>Vendor</th>
+<th>Ingredient</th>
+<th>Qty</th>
+<th>Unit cost</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>${p.slice(-150).reverse().map(x => `<tr>
+<td>${x.date}</td>
+<td>${esc(x.vendor)}</td>
+<td>${esc(x.ingredient)}</td>
+<td>${x.quantity}</td>
+<td>${money(x.unit_cost)}</td>
+<td>${money(x.total)}</td>
+</tr>`).join("")}</tbody>`; }
+function renderLabor() { const l = laborRows(), r = revenue(), c = l.reduce((s, x) => s + x.labor_cost, 0),
+   h = l.reduce((s, x) => s + x.hours, 0), lp = r ? c / r * 100 : 0;
+      $("laborKpis").innerHTML = [metric("Labor cost", money(c),
+         `${percent(lp)} of sales`, lp > app.settings.laborTarget ? "trend-warn" : "trend-good"), metric("Labor hours", h.toFixed(1), "Loaded shift data"), metric("Sales / labor hour", money(h ? r / h : 0), "Productivity"), metric("Cost / cover", money(covers() ? c / covers() : 0), "Labor / guest")].join(""); const roles = new Map(); l.forEach(x => { const z = roles.get(x.role) || { role: x.role, hours: 0, cost: 0 }; z.hours += x.hours; z.cost += x.labor_cost; roles.set(x.role, z); }); $("roleTable").innerHTML = `<thead>
+<tr>
+<th>Role</th>
+<th>Hours</th>
+<th>Labor cost</th>
+<th>Cost %</th>
+<th>Sales / hour</th>
+</tr>
+</thead>
+<tbody>${[...roles.values()].sort((a, b) => b.cost - a.cost).map(x => `<tr>
+<td>${esc(x.role)}</td>
+<td>${x.hours.toFixed(1)}</td>
+<td>${money(x.cost)}</td>
+<td>${percent(c ? x.cost / c * 100 : 0)}</td>
+<td>${money(x.hours ? r / x.hours : 0)}</td>
+</tr>`).join("")}</tbody>`; const map = new Map(dailySales().map(x => [x.date, { sales: x.sales, labor: 0 }]));
+   l.forEach(x => { const z = map.get(x.date); if (z)
+    z.labor += x.labor_cost; }); const s = [...map.entries()].slice(-30); chart("laborChart", "line",
+       { labels: s.map(x => x[0]), datasets: [{ label: "Sales", data: s.map(x => x[1].sales),
+          borderColor: COLORS.accent2, borderWidth: 1.6, pointRadius: 0, tension: .2 }, { label: "Labor cost",
+             data: s.map(x => x[1].labor), borderColor: COLORS.green, borderWidth: 1.3, pointRadius: 0,
+                tension: .2 }] }, { legend: true }); const n = forecast(1).future[0],
+                   g = n ? Math.round(n.sales / Math.max(1, avgCheck())) : 0;
+                      $("staffingPanel").innerHTML = `<div class="metric-list">
+<div class="metric-row">
+<span>Forecast guests</span>
+<strong>${g || "—"}</strong>
+</div>
+<div class="metric-row">
+<span>Suggested headcount</span>
+<strong>${g ? Math.max(1, Math.ceil(g / 10)) : "—"}</strong>
+</div>
+<div class="metric-row">
+<span>Current labor %</span>
+<strong>${percent(lp)}</strong>
+</div>
+</div>
+<div class="warning" style="margin-top:9px">Planning heuristic only;
+   validate role requirements and local labor law.</div>`; }
+function renderCustomers() { const g = guestRows(), c = covers(), r = revenue(), avg = c ? r / c : 0, turn = g.reduce((a, x) => a + x.turned_away, 0), res = filtered("reservations"), no = res.filter(x => /no.?show/i.test(String(x.status || x.no_show))).length; $("customerKpis").innerHTML = [metric("Guests / covers", c.toLocaleString(), "POS + guest data"), metric("Average check", money(avg), "Revenue / covers"), metric("Turned away", turn.toLocaleString(), "Guest logs", turn ? "trend-warn" : "trend-good"), metric("Reservation no-show", res.length ? percent(no / res.length * 100) : "—", res.length ? `${res.length} reservations` : "Import reservations")].join(""); const daily = dailySales().slice(-30), gm = new Map(g.map(x => [x.date, x.served_covers])); chart("trafficChart", "line", { labels: daily.map(x => x.date), datasets: [{ label: "Covers", data: daily.map(x => gm.get(x.date) || x.covers), borderColor: COLORS.accent2, borderWidth: 1.6, pointRadius: 0, tension: .2 }, { label: "Sales", data: daily.map(x => x.sales), borderColor: COLORS.dim, borderWidth: 1.3, pointRadius: 0, tension: .2 }] }, { legend: true }); const by = Array(7).fill(0); salesRows().forEach(x => { by[parseDate(x.date).getDay()] += x.guest_count; }); const max = Math.max(...by, 1); $("heatmap").innerHTML = `<div class="smalltext muted" style="margin-bottom:8px">Guest distribution by weekday.</div>
+<div class="heatmap" style="grid-template-columns:48px repeat(7,minmax(28px,1fr))">
+<div class="hmh">Guest</div>${["Sun", "Mon", "Tue", "Wed", "Thu", "Fri",
+   "Sat"].map(d => `<div class="hmh">${d}</div>`).join("")}${by.map(v => `<div style="min-height:24px;display:grid;place-items:center;border-radius:3px;background:rgba(245,158,11,${.08 + .72 * v / max})">${v ? Math.round(v).toLocaleString() : ""}</div>`).join("")}</div>`; $("capacityPanel").innerHTML = `<div class="metric-list">
+<div class="metric-row">
+<span>Seats</span>
+<strong>${app.settings.seats}</strong>
+</div>
+<div class="metric-row">
+<span>Operating hours</span>
+<strong>${app.settings.hours}</strong>
+</div>
+<div class="metric-row">
+<span>Revenue / seat</span>
+<strong>${money(app.settings.seats ? r / app.settings.seats : 0)}</strong>
+</div>
+<div class="metric-row">
+<span>RevPASH</span>
+<strong>${money(app.settings.seats && app.settings.hours ? r / (app.settings.seats * app.settings.hours) : 0)}</strong>
+</div>
+</div>`; const party = res.length ? res.reduce((a, x) => a + num(x.party_size), 0) / res.length : 0; $("reservationPanel").innerHTML = `<div class="metric-list">
+<div class="metric-row">
+<span>Bookings</span>
+<strong>${res.length.toLocaleString()}</strong>
+</div>
+<div class="metric-row">
+<span>No-shows flagged</span>
+<strong>${no}</strong>
+</div>
+<div class="metric-row">
+<span>Average party size</span>
+<strong>${party ? party.toFixed(1) : "—"}</strong>
+</div>
+</div>`; $("customerSignals").innerHTML = `<ul class="list-clean">
+<li>Average check is a central demand and pricing lever.</li>
+<li>Separate traffic forecasting from sales when guest data exists.</li>
+<li>Turn-away counts indicate whether capacity may be the constraint.</li>
+</ul>`; }
+function renderWaste() { const w = wasteRows(), lw = w.reduce((a, x) => a + x.cost, 0), t = theoreticalCOGS(), a = actualCOGS(), v = a - t; $("wasteKpis").innerHTML = [metric("Logged waste", money(lw), "Waste log cost", lw ? "trend-warn" : "trend-good"), metric("Theoretical COGS", money(t), "Recipe × sales"), metric("Actual COGS", money(a), "Purchases + inventory"), metric("COGS variance", money(v), t ? percent(v / t * 100) : "Need both costs", v > 0 ? "trend-bad" : "trend-good")].join(""); chart("cogsChart", "bar", { labels: ["Theoretical", "Actual", "Variance"], datasets: [{ label: "COGS", data: [t, a, Math.abs(v)], backgroundColor: ["#fbbf24", "#d97706", v > 0 ? "#ef4444" : "#10b981"], borderWidth: 0 }] }, { legend: false }); const d = []; if (lw)
+    d.push(`Logged waste: ${money(lw)}`); if (v > 0)
+    d.push(`Unexplained / other variance: ${money(v)}`); const ps = new Map(); purchaseRows().forEach(x => ps.set(x.ingredient, (ps.get(x.ingredient) || 0) + x.total)); [...ps.entries()].sort((x, y) => y[1] - x[1]).slice(0, 3).forEach(x => d.push(`Top purchase spend: ${esc(x[0])} — ${money(x[1])}`)); $("lossDrivers").innerHTML = d.length ? `<ul class="list-clean">${d.map(x => `<li>${x}</li>`).join("")}</ul>` : `<div class="successbox">No loss driver is visible.</div>`; $("wasteTable").innerHTML = `<thead>
+<tr>
+<th>Date</th>
+<th>Ingredient</th>
+<th>Qty</th>
+<th>Reason</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>${w.slice(-150).reverse().map(x => `<tr>
+<td>${x.date}</td>
+<td>${esc(x.ingredient)}</td>
+<td>${x.quantity} ${esc(x.unit)}</td>
+<td>${esc(x.reason)}</td>
+<td>${money(x.cost)}</td>
+</tr>`).join("")}</tbody>`; }
+function scenarioBase() { const base = revenue() / Math.max(1, rangeDays()) * 30 || 1; return { base }; }
+function renderScenarios() { const fields = [["traffic", "Guest traffic change %"], ["check",
+   "Average check change %"], ["food", "Food cost change %"], ["labor", "Labor cost change %"], ["opex",
+      "Other operating cost change %"], ["marketing", "Marketing spend change %"], ["hours",
+         "Operating hours change"], ["pricing", "Price change %"]];
+            $("scenarioForm").innerHTML = fields.map(x => `<div class="field">
+<label>${x[1]}</label>
+<input id="sc_${x[0]}" type="number" value="0" step=".5">
+</div>`).join(""); runScenario(); renderScenarioTable(); }
+function sc(key) { return num($("sc_" + key)?.value); }
+function runScenario() { const b = scenarioBase(), traffic = sc("traffic") / 100, check = sc("check") / 100, price = sc("pricing") / 100, food = sc("food") / 100, labc = sc("labor") / 100, opx = sc("opex") / 100, marketing = sc("marketing") / 100; const r = b.base * (1 + traffic) * (1 + check) * (1 + price); const c = (theoreticalCOGS() || b.base * .3) * (1 + traffic + check * .15) * (1 + food), l = (labor() || b.base * .2) * (1 + traffic * .6) * (1 + labc), o = (opex() || b.base * .1) * (1 + opx) + Math.max(0, opex() * .15) * marketing, op = r - c - l - o; $("scenarioResult").innerHTML = `<div class="metric-list">
+<div class="metric-row">
+<span>Projected monthly sales</span>
+<strong>${money(r)}</strong>
+</div>
+<div class="metric-row">
+<span>Projected COGS</span>
+<strong>${money(c)}</strong>
+</div>
+<div class="metric-row">
+<span>Projected labor</span>
+<strong>${money(l)}</strong>
+</div>
+<div class="metric-row">
+<span>Projected Opex</span>
+<strong>${money(o)}</strong>
+</div>
+<div class="metric-row">
+<span>Operating profit</span>
+<strong class="${op < 0 ? "trend-bad" : "trend-good"}">${money(op)}</strong>
+</div>
+<div class="metric-row">
+<span>Operating margin</span>
+<strong>${percent(op / r * 100)}</strong>
+</div>
+</div>`; return { r, c, l, o, op }; }
+function renderScenarioTable() { const b = scenarioBase().base, arr = [["Base", 0, 0, 0, 0], ["Growth", 10, 3, 2, 5], ["Stress", -10, -2, 8, 10]]; $("scenarioTable").innerHTML = `<thead>
+<tr>
+<th>Scenario</th>
+<th>Traffic</th>
+<th>Check</th>
+<th>Food</th>
+<th>Labor</th>
+<th>Profit</th>
+</tr>
+</thead>
+<tbody>${arr.map(x => { const r = b * (1 + x[1] / 100) * (1 + x[2] / 100),
+   c = (theoreticalCOGS() || b * .3) * (1 + x[3] / 100), l = (labor() || b * .2) * (1 + x[4] / 100),
+      p = r - c - l - (opex() || b * .1); return `<tr>
+<td>${x[0]}</td>
+<td>${x[1]}%</td>
+<td>${x[2]}%</td>
+<td>${x[3]}%</td>
+<td>${x[4]}%</td>
+<td>${money(p)}</td>
+</tr>`; }).join("")}</tbody>`; }
+function renderReports() { const r = revenue(), c = theoreticalCOGS(), l = labor(), op = r - c - l - opex(),
+   q = quality(), a = actions(); $("execBrief").innerHTML = `<ul class="list-clean">
+<li>
+<strong>${money(r)}</strong> revenue across ${rangeDays()} days.</li>
+<li>Food cost ${percent(r ? c / r * 100 : 0)}; labor ${percent(r ? l / r * 100 : 0)}.</li>
+<li>Next-day forecast ${money(forecast(7).future[0]?.sales || 0)}.</li>
+<li>Operating profit estimate ${money(op)}.</li>
+</ul>`; $("reportActions").innerHTML = a.length ? `<ul class="list-clean">${a.map(x => `<li>${esc(x.text)}</li>`).join("")}</ul>` : `<div class="successbox">No major flags.</div>`; $("dataQuality").innerHTML = `<div class="stat">
+<div class="k">Data quality</div>
+<div class="v">${q.score}/100</div>
+<div class="d">Rule-based completeness score</div>
+</div>
+<div class="progress" style="margin:9px 0">
+<i style="width:${q.score}%">
+</i>
+</div>
+<ul class="list-clean">${q.issues.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`; }
+function renderData() { const q = quality(), rows = KEYS.reduce((a, k) => a + app.db[k].length, 0),
+   locations = new Set(); KEYS.forEach(k => app.db[k].forEach(r => { const x = loc(r); if (x)
+    locations.add(x); })); $("dataSummary").innerHTML = `<div class="stat">
+<div class="k">Dataset health</div>
+<div class="v">${q.score}/100</div>
+<div class="d">${rows.toLocaleString()} rows • ${locations.size} locations</div>
+</div>
+<div class="progress" style="margin:9px 0">
+<i style="width:${q.score}%">
+</i>
+</div>
+<ul class="list-clean">${q.issues.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`;
+   $("datasetTable").innerHTML = `<thead>
+<tr>
+<th>Dataset</th>
+<th>Rows</th>
+<th>Status</th>
+<th>Core fields</th>
+</tr>
+</thead>
+<tbody>${KEYS.map(k => { const f = CORE[k] || Object.keys(app.db[k][0] || {}); return `<tr>
+<td>${k}</td>
+<td>${app.db[k].length.toLocaleString()}</td>
+<td>
+<span class="badge ${app.db[k].length ? "good" : "warn"}">${app.db[k].length ? "Loaded" : "Missing"}</span>
+</td>
+<td>${f.slice(0, 6).join(", ")}${f.length > 6 ? "…" : ""}</td>
+</tr>`; }).join("")}</tbody>`; $("schemaTags").innerHTML = KEYS.flatMap(k => (CORE[k] || Object.keys(app.db[k][0] || {})).slice(0, 10).map(f => `<span class="tag">${esc(k + "." + f)}</span>`)).join("");     renderProfiles();
+}
+/* Profiles are rendered after the Data Hub DOM exists. */
+function fillSettings() {
+    const m = {
+        sName: "name",
+        sCurrency: "currency",
+        sSeats: "seats",
+        sHours: "hours",
+        sFixed: "fixedMonthly",
+        sFood: "foodTarget",
+        sLabor: "laborTarget",
+        sCash: "openingCash",
+        sLead: "supplierLeadDays",
+        sSafety: "safetyDays",
+        sCoverage: "orderCoverageDays",
+        sNotes: "notes"
+    };
+    Object.entries(m).forEach(([id, key]) => {
+        if ($(id)) $(id).value = app.settings[key];
+    });
+    if ($("sFoh")) {
+        $("sFoh").value = app.settings.staffing?.fohGuestsPerPerson || 28;
+        $("sBoh").value = app.settings.staffing?.bohGuestsPerPerson || 24;
+        $("sManager").value = app.settings.staffing?.managerGuestsPerPerson || 120;
+    }
+}
+/* ============================================================
+   COPILOT + MODALS
+   ============================================================ */
+function copilot(q) { q = String(q || "").toLowerCase(); const r = revenue(), c = theoreticalCOGS(), l = labor(), op = r - c - l - opex(), fp = r ? c / r * 100 : 0, lp = r ? l / r * 100 : 0; if (/profit|margin|earning/.test(q)) {
+    const s = [];
+    if (fp > app.settings.foodTarget)
+        s.push(`food cost at ${percent(fp)} is above target`);
+    if (lp > app.settings.laborTarget)
+        s.push(`labor at ${percent(lp)} is above target`);
+    if (op < 0)
+        s.push(`operating profit is negative at ${money(op)}`);
+    return `Current operating estimate: <strong>${money(op)}</strong>. Revenue ${money(r)},
+       theoretical COGS ${money(c)},
+          labor ${money(l)}. Main signals: ${s.join("; ") || "no major cost-ratio breach"}.`;
+} if (/order|buy|stock|ingredient/.test(q)) {
+    const a = inventoryRows().filter(x => x.status !== "OK").slice(0, 8);
+    return a.length ? `Highest-priority inventory actions:<ul class="list-clean">${a.map(x => `<li>
+<strong>${esc(x.ingredient)}</strong> — ${x.days > 100 ? "no usable usage history" : x.days.toFixed(1) + " days of cover"}; stock ${x.qty} ${esc(x.unit)}; ${x.status}.</li>`).join("")}</ul>` : `No ingredient is currently flagged for reorder by the simple model. Add stock counts, recipes and lead times for stronger planning.`;
+} if (/menu|dish|item|food/.test(q)) {
+    return `Top contribution items:<ul class="list-clean">${menuAnalysis().slice(0, 5).map(x => `<li>
+<strong>${esc(x.name)}</strong> — ${x.class}; ${x.qty.toLocaleString()} units; contribution ${money(x.cm)};
+   food cost ${percent(x.foodPct)}.</li>`).join("")}</ul>`;
+} if (/labor|staff|employee|wage/.test(q)) {
+    const h = laborRows().reduce((a, x) => a + x.hours, 0);
+    return `Labor is <strong>${percent(lp)}</strong> of loaded sales with <strong>${money(l)}</strong> in labor cost. Sales / labor hour: <strong>${money(h ? r / h : 0)}</strong>. Target: ${percent(app.settings.laborTarget)}.`;
+} if (/forecast|tomorrow|next week|next month/.test(q)) {
+    const f = forecast(7), n = f.future[0], w = f.future.reduce((a, x) => a + x.sales, 0);
+    return `Method: <strong>${esc(f.method)}</strong>. Next day: <strong>${money(n?.sales || 0)}</strong>,
+       range <strong>${money(n?.lo || 0)}–${money(n?.hi || 0)}</strong>. Next 7 days: <strong>${money(w)}</strong>. WAPE: <strong>${f.wape == null ? "not available" : percent(f.wape)}</strong>.`;
+} if (/break.?even/.test(q)) {
+    const b = breakEven();
+    return `Break-even sales are approximately <strong>${money(b.breakEvenSales)}</strong>,
+       or about <strong>${Math.ceil(b.breakEvenGuests).toLocaleString()} guests</strong>. Contribution margin ratio: <strong>${percent(b.cmr * 100)}</strong>.`;
+} if (/food cost|cogs|waste|variance/.test(q)) {
+    const a = actualCOGS(), t = theoreticalCOGS(), v = a - t, w = wasteRows().reduce((s, x) => s + x.cost, 0);
+    return `Theoretical COGS ${money(t)}; actual COGS ${money(a)}; variance ${money(v)};
+       logged waste ${money(w)}.`;
+} return `I can answer about sales, profit, forecast, inventory, menu engineering, labor, food cost,
+   waste and break-even.`; }
+function openModal(title, html) { $("modalTitle").textContent = title; $("modalBody").innerHTML = html; $("modal").classList.add("show"); $("modal").setAttribute("aria-hidden", "false"); }
+function closeModal() { $("modal").classList.remove("show"); $("modal").setAttribute("aria-hidden", "true"); }
+function openRecipe() { openModal("Add recipe ingredient", `<div class="formgrid">
+<div class="field">
+<label>Menu item</label>
+<input id="mItem">
+</div>
+<div class="field">
+<label>Ingredient</label>
+<input id="mIng">
+</div>
+<div class="field">
+<label>Quantity</label>
+<input id="mQty" type="number" step=".001">
+</div>
+<div class="field">
+<label>Unit</label>
+<input id="mUnit" value="kg">
+</div>
+<div class="field">
+<label>Unit cost</label>
+<input id="mCost" type="number" step=".01">
+</div>
+<div class="field">
+<label>Yield %</label>
+<input id="mYield" type="number" value="100">
+</div>
+</div>
+<div class="toolbar" style="margin-top:9px">
+<button class="btn primary" id="saveRecipe">Save recipe line</button>
+</div>`); $("saveRecipe").onclick = () => { app.db.recipes.push({ menu_item: $("mItem").value.trim(), ingredient: $("mIng").value.trim(), quantity: num($("mQty").value), unit: $("mUnit").value.trim(), unit_cost: num($("mCost").value), yield_pct: num($("mYield").value) || 100 }); closeModal(); changed("Recipe line added"); }; }
+function openStock() { openModal("Add inventory count", `<div class="formgrid">
+<div class="field">
+<label>Ingredient</label>
+<input id="iIng">
+</div>
+<div class="field">
+<label>Quantity</label>
+<input id="iQty" type="number" step=".001">
+</div>
+<div class="field">
+<label>Unit</label>
+<input id="iUnit" value="kg">
+</div>
+<div class="field">
+<label>Unit cost</label>
+<input id="iCost" type="number" step=".01">
+</div>
+<div class="field">
+<label>Expiry date</label>
+<input id="iExp" type="date">
+</div>
+<div class="field">
+<label>Location</label>
+<input id="iLoc">
+</div>
+</div>
+<div class="toolbar" style="margin-top:9px">
+<button class="btn primary" id="saveStock">Save count</button>
+</div>`); $("saveStock").onclick = () => { const q = num($("iQty").value); app.db.inventory.push({ date: dateKey(new Date()), ingredient: $("iIng").value.trim(), quantity: q, closing_quantity: q, unit: $("iUnit").value.trim(), unit_cost: num($("iCost").value), expiry_date: $("iExp").value, location: $("iLoc").value.trim() }); closeModal(); changed("Inventory count added"); }; }
+function openCapex() { openModal("Capital expenditure calculator", `<div class="formgrid">
+<div class="field">
+<label>Purchase cost</label>
+<input id="cxCost" type="number" value="100000">
+</div>
+<div class="field">
+<label>Annual net benefit / saving</label>
+<input id="cxBenefit" type="number" value="50000">
+</div>
+<div class="field">
+<label>Useful life (years)</label>
+<input id="cxLife" type="number" value="5">
+</div>
+<div class="field">
+<label>Discount rate %</label>
+<input id="cxRate" type="number" value="10">
+</div>
+</div>
+<div class="toolbar" style="margin-top:9px">
+<button class="btn primary" id="calcCapex">Calculate</button>
+</div>
+<div id="capexResult" style="margin-top:9px">
+</div>`); $("calcCapex").onclick = () => { const c = num($("cxCost").value), b = num($("cxBenefit").value), life = num($("cxLife").value), r = num($("cxRate").value) / 100; const pay = b ? c / b : Infinity; let npv = -c; for (let y = 1; y <= life; y++)
+    npv += b / (1 + r) ** y; $("capexResult").innerHTML = `<div class="successbox">Simple payback: <strong>${Number.isFinite(pay) ? pay.toFixed(2) + " years" : "—"}</strong>
+<br>NPV at ${percent(r * 100)}: <strong>${money(npv)}</strong>
+<br>A precise IRR needs a full cash-flow series.</div>`; }; }
+function changed(msg) { app.settings.demo = false; invalidate(); refreshLocations(); saveState(); render(); toast(msg); }
+/* ============================================================
+   DEMO DATA
+   ============================================================ */
+function loadDemo() { const names = ["Chicken Biryani", "Chicken Burger", "Beef Burger", "French Fries", "Grilled Chicken", "Cold Coffee", "Coke 330ml", "Cheesecake"], cats = ["Main", "Main", "Main", "Side", "Main", "Beverage", "Beverage", "Dessert"], costs = [130, 120, 150, 40, 170, 45, 18, 60], prices = [320, 360, 420, 150, 480, 180, 80, 220], db = emptyDb(), start = addDays(new Date(), -89); db.menu = names.map((n, i) => ({ item_id: String(i + 1), item_name: n, category: cats[i], price: prices[i], ingredient_cost: costs[i], prep_minutes: [18, 12, 14, 7, 22, 5, 1, 6][i], active: "1" })); names.forEach((n, i) => db.recipes.push({ menu_item: n, ingredient: ["Rice", "Chicken", "Beef", "Potato", "Chicken", "Coffee", "Cola", "Cream"][i], quantity: [.25, .18, .2, .18, .28, .02, 1, .06][i], unit: ["kg", "kg", "kg", "kg", "kg", "kg", "each", "kg"][i], unit_cost: [180, 520, 750, 90, 610, 1400, 65, 900][i], yield_pct: 95 })); for (let d = 0; d < 90; d++) {
+    const dt = addDays(start, d), dow = dt.getDay(), season = [.82, .94, 1, 1.05, 1.08, 1.22, 1.18][dow], growth = 1 + d / 180, weather = d % 9 === 0 || d % 17 === 0 ? .9 : 1, cov = Math.round((180 + 45 * Math.sin(d / 7) + 20 * (dow === 5 || dow === 6)) * season * growth * weather);
+    names.forEach((n, i) => { const base = [.27, .18, .12, .17, .1, .07, .06, .03][i], q = Math.max(0, Math.round(cov * base * (1 + ((d * 13 + i * 7) % 11 - 5) / 80))), gross = q * prices[i], disc = d % 13 === 0 ? gross * .03 : 0; db.sales.push({ date: dateKey(dt), time: `${11 + (i % 6) * 2}:00`, order_id: `D${d}-${i}-${Math.floor(d * 99 + i)}`, item_id: String(i + 1), item_name: n, category: cats[i], quantity: q, unit_price: prices[i], gross_sales: gross, discount: disc, refund: 0, void: 0, net_sales: gross - disc, guest_count: i === 0 ? Math.round(cov * .2) : 0, order_type: "Dine-in", channel: i % 5 === 0 ? "Delivery" : "Dine-in", payment_method: i % 2 ? "Card" : "Cash", location: "Main" }); });
+    db.labor.push({ date: dateKey(dt), employee: "Kitchen Team", role: "Kitchen", hours: Math.max(7, 8 + dow % 3), hourly_wage: 120, labor_cost: Math.max(7, 8 + dow % 3) * 120, location: "Main" }, { date: dateKey(dt), employee: "FOH Team", role: "Front of House", hours: Math.max(8, 8 + dow % 2), hourly_wage: 110, labor_cost: Math.max(8, 8 + dow % 2) * 110, location: "Main" });
+    if (d % 2 === 0) {
+        db.expenses.push({ date: dateKey(dt), category: "Utilities", amount: 900, location: "Main" });
+        db.purchases.push({ date: dateKey(dt), vendor: "Local Foods", ingredient: "Chicken", quantity: 35, unit: "kg", unit_price: 520, total: 18200, location: "Main" }, { date: dateKey(dt), vendor: "Local Foods", ingredient: "Rice", quantity: 45, unit: "kg", unit_price: 180, total: 8100, location: "Main" });
+    }
+    if (d % 5 === 0)
+        db.waste.push({ date: dateKey(dt), ingredient: "Vegetables", quantity: 2.5, unit: "kg", reason: "Prep loss", cost: 450, location: "Main" });
+    db.inventory.push({ date: dateKey(dt), ingredient: "Chicken", quantity: 42, closing_quantity: 42, unit: "kg", unit_cost: 520, expiry_date: dateKey(addDays(dt, 3)), location: "Main" });
+} app.db = db; app.settings = { ...DEFAULTS, name: "Aznur Demo Restaurant", fixedMonthly: 120000, openingCash: 500000, demo: true }; invalidate(); refreshLocations(); saveState(); render(); toast("Demo dataset loaded"); }
+/* ============================================================
+   NAVIGATION / STATUS / EVENTS
+   ============================================================ */
+function refreshLocations() { const s = $("locationFilter"), old = s.value, set = new Set(); KEYS.forEach(k => app.db[k].forEach(r => { const v = loc(r); if (v)
+    set.add(v); })); s.innerHTML = `<option value="ALL">All locations</option>${[...set].sort().map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join("")}`; if ([...s.options].some(x => x.value === old))
+    s.value = old; }
+function updateStatus() { let rows = 0; const ls = new Set(); KEYS.forEach(k => { rows += app.db[k].length;
+   app.db[k].forEach(r => { const l = loc(r); if (l)
+    ls.add(l); }); }); $("dataBadge").textContent = app.settings.demo ? "Demo data" : app.db.sales.length ? "Live local data" : "No data"; $("periodLabel") && ($("periodLabel").textContent = rangeDays() ? `${rangeDays()} days loaded` : "No sales data"); $("statusData").textContent = app.settings.demo ? "DEMO" : app.db.sales.length ? "LOCAL" : "EMPTY"; $("statusRows").textContent = rows.toLocaleString(); $("statusLocations").textContent = String(ls.size); $("statusEngine").textContent = "READY"; }
+function setView(v) { app.view = v; document.querySelectorAll(".view").forEach(x => x.classList.toggle("active", x.id === `view-${v}`)); document.querySelectorAll("[data-view]").forEach(x => x.classList.toggle("active", x.dataset.view === v)); $("topTitle").textContent = TITLES[v] || "Dashboard"; $("sidebar").classList.remove("open"); render(); }
+function render() {
+    const renderers = {
+        dashboard: renderDashboard,
+        operations: renderOperations,
+        forecast: renderForecast,
+        finance: renderFinance,
+        menu: renderMenu,
+        inventory: renderInventory,
+        purchasing: renderPurchasing,
+        labor: renderLabor,
+        customers: renderCustomers,
+        waste: renderWaste,
+        control: renderControl,
+        scenarios: renderScenarios,
+        reports: renderReports,
+        copilot: () => {},
+        data: renderData,
+        settings: fillSettings
+    };
+    const fn = renderers[app.view];
+    if (fn) fn();
+    updateStatus();
+}
+function bind() {
+    document.addEventListener("click", e => { const b = e.target.closest("[data-view]"); if (b)
+        setView(b.dataset.view); const q = e.target.closest("[data-q]"); if (q) {
+        $("copilotQuestion").value = q.dataset.q;
+        $("askBtn").click();
+    } const tag = e.target.closest("#suggestedQuestions .tag"); if (tag) {
+        $("copilotQuestion").value = tag.textContent;
+        $("askBtn").click();
+    } });
+    $("menuBtn").onclick = () => $("sidebar").classList.toggle("open");
+    $("importBtn").onclick = () => setView("data");
+    $("demoBtn").onclick = loadDemo;
+    $("locationFilter").onchange = () => { invalidate(); render(); };
+    $("refreshBtn").onclick = () => { invalidate(); saveState(); render(); toast("Dashboard refreshed"); };
+    $("runForecast").onclick = () => { invalidate(); renderForecast(); toast("Forecast recalculated"); };
+    $("runScenario").onclick = () => { runScenario(); renderScenarioTable(); toast("Scenario calculated"); };
+    $("addRecipeBtn").onclick = openRecipe;
+    $("stockCountBtn").onclick = openStock;
+    $("askBtn").onclick = () => $("copilotAnswer").innerHTML = `<div class="successbox">${copilot($("copilotQuestion").value)}</div>`;
+    $("closeModal").onclick = closeModal;
+    $("modal").onclick = e => { if (e.target === $("modal"))
+        closeModal(); };
+    document.addEventListener("keydown", e => { if (e.key === "Escape")
+        closeModal(); });
+    $("dataImportBtn").onclick = () => $("fileInput").click();
+    $("chooseFiles").onclick = () => $("fileInput").click();
+    $("fileInput").onchange = () => handleFiles($("fileInput").files);
+    const drop = $("drop");
+    ["dragenter", "dragover"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add("drag"); }));
+    ["dragleave", "drop"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove("drag"); }));
+    drop.addEventListener("drop", e => handleFiles(e.dataTransfer.files));
+    $("clearDataBtn").onclick = () => { if (!confirm("Delete all local restaurant data and settings?"))
+        return; app.db = emptyDb(); app.settings = { ...DEFAULTS }; localStorage.removeItem("aznurRestaurantDB"); localStorage.removeItem("aznurRestaurantSettings"); invalidate(); refreshLocations(); render(); toast("Local data cleared"); };
+    $("saveSettings").onclick = () => {
+        app.settings = {
+            ...app.settings,
+            name: $("sName").value.trim() || "Aznur Restaurant",
+            currency: $("sCurrency").value,
+            seats: num($("sSeats").value) || 80,
+            hours: num($("sHours").value) || 12,
+            fixedMonthly: num($("sFixed").value),
+            foodTarget: num($("sFood").value) || 30,
+            laborTarget: num($("sLabor").value) || 20,
+            openingCash: num($("sCash").value),
+            supplierLeadDays: num($("sLead").value) || 2,
+            safetyDays: num($("sSafety").value) || 1,
+            orderCoverageDays: num($("sCoverage").value) || 5,
+            staffing: {
+                fohGuestsPerPerson: num($("sFoh").value) || 28,
+                bohGuestsPerPerson: num($("sBoh").value) || 24,
+                managerGuestsPerPerson: num($("sManager").value) || 120
+            },
+            notes: $("sNotes").value,
+            demo: false
+        };
+        invalidate();
+        saveState();
+        render();
+        toast("Settings saved");
+    };
+    ["exportSales", "exportPurchases", "exportInventory2", "exportLabor", "exportExpenses"].forEach(id => { const key = { exportSales: "sales", exportPurchases: "purchases", exportInventory2: "inventory", exportLabor: "labor", exportExpenses: "expenses" }[id]; $(id).onclick = () => download(`aznur_${key}.csv`, csv(app.db[key]), "text/csv"); });
+    $("exportInventory").onclick = () => download("aznur_inventory.csv", csv(app.db.inventory), "text/csv");
+    $("exportMenu").onclick = () => download("aznur_menu_analysis.csv", csv(menuAnalysis()), "text/csv");
+    $("exportPnl").onclick = () => download("aznur_pnl.csv", csv(monthlyPnl()), "text/csv");
+    $("exportAll").onclick = () => download("aznur_restaurant_data.json", JSON.stringify({ db: app.db, settings: app.settings }, null, 2), "application/json");
+    $("printReport").onclick = () => window.print();
+    $("printPnl").onclick = () => window.print();
+    document.querySelectorAll(".tpl").forEach(b => b.onclick = () => download(`aznur_template_${b.dataset.type}.csv`, `${(CORE[b.dataset.type] || []).join(",")}\n`, "text/csv"));
+}
+function boot() {
+  try {
+    mountViews();
+    buildNav();
+    loadState();
+    if (!app.db.sales.length) {
+      loadDemo();
+    } else {
+      refreshLocations();
+      app.rev++;
+      render();
+    }
+    bind();
+  } catch (error) {
+    console.error(error);
+    const host = document.getElementById("viewHost");
+    if (host) {
+      host.innerHTML = `<div class="card dangerbox"><strong>Restaurant Studio could not start.</strong><br><span class="smalltext">${esc(error.message || error)}</span></div>`;
+    }
+  }
+}
+if (document.readyState === "loading")
+    document.addEventListener("DOMContentLoaded", boot, { once: true });
+else
+    boot();
+window.addEventListener("beforeunload", saveState);
+</script>
+</body>
+</html>
